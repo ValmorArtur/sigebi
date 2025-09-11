@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Recuperar Senha</title>
+  <link rel="stylesheet" th:href="@{/css/tailwind.css}">
+
+</head>
+
+<body class="bg-[#2d3e50] flex items-center justify-center min-h-screen">
+
+  <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-sm">
+
+    <!-- Título com quadrado amarelo atrás do R -->
+    <div class="relative flex justify-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-800 relative">
+        <span class="inline-block relative">
+          <span class="absolute w-[17px] h-[17px] bg-yellow-400 rounded-sm -left-[1.5px] top-[3px] z-0"></span>
+          <span class="relative z-10">R</span>
+        </span>ecuperar Senha
+      </h1>
+    </div>
+
+    <!-- Mensagens -->
+    <div th:if="${erro}" class="text-red-500 font-semibold mb-4 text-center">
+      <p th:text="${erro}"></p>
+    </div>
+
+    <div th:if="${mensagem}" class="text-green-600 font-semibold mb-4 text-center">
+      <p th:text="${mensagem}"></p>
+    </div>
+
+    <!-- Formulário -->
+    <form id="formRecuperarSenha" th:action="@{/usuario/esqueci_senha}" method="post" onsubmit="return validarSenhas()">
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Login</label>
+        <input type="text" name="loginUsuario" placeholder="Digite seu login"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400"
+          required />
+      </div>
+
+      <!-- Campo Nova Senha -->
+      <div class="mb-6 relative">
+        <label for="novaSenha" class="block text-sm font-medium text-gray-700">Nova Senha</label>
+        <input type="password" id="novaSenha" name="novaSenha"
+          class="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400"
+          placeholder="Digite a nova senha" required>
+        <img src="/img/eye-open.png" id="toggleNovaSenha" onclick="toggleSenhaImagem('novaSenha', 'toggleNovaSenha')"
+          class="w-6 h-6 absolute top-9 right-3 cursor-pointer opacity-40 hover:opacity-100 transition" alt="mostrar senha">
+      </div>
+
+      <!-- Campo Confirmar Senha -->
+      <div class="mb-6 relative">
+        <label for="confirmarSenha" class="block text-sm font-medium text-gray-700">Confirmar Senha</label>
+        <input type="password" id="confirmarSenha" name="confirmarSenha"
+          class="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400"
+          placeholder="Digite novamente a nova senha" required>
+        <img src="/img/eye-open.png" id="toggleConfirmarSenha"
+          onclick="toggleSenhaImagem('confirmarSenha', 'toggleConfirmarSenha')"
+          class="w-6 h-6 absolute top-9 right-3 cursor-pointer opacity-40 hover:opacity-100 transition" alt="mostrar senha">
+        <p id="erroSenha" class="text-red-500 text-sm mt-1 hidden">As senhas não coincidem.</p>
+      </div>
+
+      <div id="erroSenhas" class="text-red-500 font-semibold mb-4 text-center hidden">
+        As senhas não coincidem.
+      </div>
+
+      <button type="submit"
+        class="w-full bg-[#2d3e50] text-white py-2 rounded hover:bg-[#1f2d3a] transition duration-150">
+        Alterar Senha
+      </button>
+
+      <div class="text-center mt-4 text-sm">
+        <a th:href="@{/login}" class="text-yellow-500 hover:underline">
+          Voltar ao login
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- JavaScript de validação -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const senha = document.getElementById("novaSenha");
+      const confirmar = document.getElementById("confirmarSenha");
+      const msgErro = document.getElementById("erroSenha");
+
+      confirmar.addEventListener("input", function () {
+        if (senha.value !== confirmar.value) {
+          confirmar.classList.add("border-red-500");
+          msgErro.classList.remove("hidden");
+        } else {
+          confirmar.classList.remove("border-red-500");
+          msgErro.classList.add("hidden");
+        }
+      });
+    });
+    function validarSenhas() {
+      const senha = document.getElementById("novaSenha");
+      const confirmar = document.getElementById("confirmarSenha");
+      const erroSenha = document.getElementById("erroSenha");
+      //const erroSenhas = document.getElementById("erroSenhas");
+
+      if (senha.value !== confirmar.value) {
+        confirmar.classList.add("border-red-500");
+        erroSenha.classList.remove("hidden");
+        //erroSenhas.classList.remove("hidden");
+        return false;
+      } else {
+        confirmar.classList.remove("border-red-500");
+        erroSenha.classList.add("hidden");
+        //erroSenhas.classList.add("hidden");
+        return true;
+      }
+    }
+  </script>
+  <script>
+    function toggleSenhaImagem(idInput, idIcon) {
+      const input = document.getElementById(idInput);
+      const icon = document.getElementById(idIcon);
+
+      if (input.type === "password") {
+        input.type = "text";
+        icon.src = "/img/eye-closed.png";
+      } else {
+        input.type = "password";
+        icon.src = "/img/eye-open.png";
+      }
+    }
+  </script>
+
+
+</body>
+
+</html>

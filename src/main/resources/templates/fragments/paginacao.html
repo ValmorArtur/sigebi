@@ -1,0 +1,15 @@
+<!-- templates/fragments/paginacao.html -->
+<div th:fragment="paginacao(baseUrl, currentPage, totalPages, filtro, q, size)">
+  <div class="flex justify-center mt-6" th:if="${totalPages > 1}">
+    <nav class="inline-flex rounded-md shadow-sm space-x-1">
+      <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+        <a th:href="@{__${baseUrl}__(page=${i}, filtro=${filtro}, q=${q}, size=${size})}"
+           th:text="${i + 1}"
+           th:class="'px-3 py-1 border ' + (${i} == ${currentPage}
+             ? 'bg-yellow-400 text-white'
+             : 'text-gray-700 hover:bg-gray-100')">
+        </a>
+      </span>
+    </nav>
+  </div>
+</div>

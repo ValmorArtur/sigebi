@@ -1,0 +1,69 @@
+<!-- templates/categoria/form.html -->
+<div th:fragment="conteudo" class="bg-white rounded-lg shadow-md p-6 relative">
+  <!-- Ícone do módulo -->
+  <div th:replace="~{fragments/card-icone :: iconeCard('/img/icon-categoria-azul.png')}"></div>
+
+  <!-- Cabeçalho com título centralizado -->
+  <div class="flex justify-between items-center mb-2">
+    <div class="absolute left-1/2 transform -translate-x-1/2 mt-14">
+      <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+        <span class="relative inline-block">
+          <span class="absolute w-[18px] h-[18px] bg-yellow-400 rounded-sm -left-2 top-[2px] z-0"></span>
+          <span class="relative z-10">C</span>
+        </span>
+        <span th:text="${categoria.idCategoria != null ? 'ategoria - Edição' : 'ategoria - Inclusão'}"></span>
+      </h1>
+    </div>
+  </div>
+
+  <!-- Linha separadora amarela -->
+  <div class="h-1 bg-yellow-400 mb-4 mt-14 rounded-sm"></div>
+
+  <!-- Mensagens -->
+  <div th:if="${erro}" class="text-red-600 font-semibold mb-4 text-center" th:text="${erro}"></div>
+  <div th:if="${mensagem}"
+       class="bg-green-100 border border-green-400 text-green-800 text-sm font-semibold p-3 rounded mb-4 text-center"
+       th:text="${mensagem}"></div>
+
+  <!-- Formulário -->
+  <form id="formCategoria" th:action="@{/categoria/salvar}" method="post" th:object="${categoria}" class="space-y-4">
+    <!-- CSRF -->
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <input type="hidden" th:field="*{idCategoria}" />
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Descrição -->
+      <div class="md:col-span-2">
+        <label class="block text-gray-700 font-semibold">Descrição</label>
+        <input th:field="*{descricao}" required maxlength="50"
+               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                      focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
+        <div class="flex justify-between">
+          <small class="text-gray-500">Máx. 50 caracteres</small>
+          <small id="contadorDescricao" class="text-gray-500"></small>
+        </div>
+        <div class="text-red-600 text-sm" th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}"></div>
+      </div>
+    </div>
+
+    <!-- Botões -->
+    <div class="flex justify-end mt-8 space-x-2">
+      <button type="reset" class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded">Limpar</button>
+      <a href="/categoria" class="bg-gray-400 text-white px-5 py-2 rounded hover:bg-gray-500 inline-flex items-center justify-center">Cancelar</a>
+      <button type="submit" class="bg-[#2e3f52] hover:bg-[#1f2d3a] text-white px-6 py-2 rounded">Salvar</button>
+    </div>
+  </form>
+
+  <!-- Script: contador de caracteres -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const input = document.querySelector('input[name="descricao"]');
+      const counter = document.getElementById('contadorDescricao');
+      if (input && counter) {
+        const update = () => { counter.textContent = (input.value?.length || 0) + '/50'; };
+        input.addEventListener('input', update);
+        update();
+      }
+    });
+  </script>
+</div>

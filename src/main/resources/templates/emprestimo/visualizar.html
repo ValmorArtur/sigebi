@@ -1,0 +1,90 @@
+<!-- templates/emprestimo/visualizar.html -->
+<div th:fragment="conteudo" class="bg-white rounded-lg shadow-md p-6 relative" th:with="e=${emprestimo}">
+  <div th:replace="~{fragments/card-icone :: iconeCard('/img/icon-loan-azul.png')}"></div>
+
+  <!-- Cabeçalho -->
+  <div class="flex justify-between items-center mb-2">
+    <div class="absolute left-1/2 transform -translate-x-1/2 mt-14">
+      <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+        <span class="relative inline-block">
+          <span class="absolute w-[18px] h-[18px] bg-yellow-400 rounded-sm -left-2 top-[2px] z-0"></span>
+          <span class="relative z-10">E</span>
+        </span>mpréstimo - Visualização
+      </h1>
+    </div>
+  </div>
+
+  <div class="h-1 bg-yellow-400 mb-4 mt-14 rounded-sm"></div>
+
+  <!-- Cards com informações -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Usuário -->
+    <div class="border border-gray-200 rounded-lg p-4">
+      <h2 class="text-lg font-semibold text-gray-800 mb-2">Usuário</h2>
+      <p><span class="text-gray-600">Login:</span>
+        <span class="font-medium" th:text="${e.usuario != null ? e.usuario.loginUsuario : '-'}">-</span>
+      </p>
+      <p><span class="text-gray-600">Nome:</span>
+        <span class="font-medium"
+          th:text="${e.usuario != null && e.usuario.nomeUsuario != null ? e.usuario.nomeUsuario : '-'}">-</span>
+      </p>
+    </div>
+
+    <!-- Exemplar -->
+    <div class="border border-gray-200 rounded-lg p-4">
+      <h2 class="text-lg font-semibold text-gray-800 mb-2">Exemplar</h2>
+      <p><span class="text-gray-600">Tombo:</span>
+        <span class="font-medium" th:text="${e.exemplar != null ? e.exemplar.idTombo : '-'}">-</span>
+      </p>
+      <p><span class="text-gray-600">Título:</span>
+        <span class="font-medium"
+          th:text="${(e.exemplar != null && e.exemplar.acervo != null) ? e.exemplar.acervo.tituloAcervo : '-'}">-</span>
+      </p>
+    </div>
+
+    <!-- Empréstimo -->
+    <div class="border border-gray-200 rounded-lg p-4">
+      <h2 class="text-lg font-semibold text-gray-800 mb-2">Empréstimo</h2>
+      <p><span class="text-gray-600">ID:</span>
+        <span class="font-medium" th:text="${e.idEmprestimo}">-</span>
+      </p>
+      <p><span class="text-gray-600">Emprestado em:</span>
+        <span class="font-medium"
+          th:text="${e.dataEmprestimo != null ? #temporals.format(e.dataEmprestimo, 'dd/MM/yyyy') : '-'}">-</span>
+      </p>
+      <p><span class="text-gray-600">Devolver até:</span>
+        <span class="font-medium"
+          th:text="${e.dataPrevistaDevolucao != null ? #temporals.format(e.dataPrevistaDevolucao, 'dd/MM/yyyy') : '-'}">-</span>
+        <span class="text-red-600 font-semibold"
+          th:if="${e.dataDevolucao == null and e.dataPrevistaDevolucao != null and T(java.time.LocalDate).now().isAfter(e.dataPrevistaDevolucao)}">
+          (Atrasado)
+        </span>
+      </p>
+      <p><span class="text-gray-600">Devolvido em:</span>
+        <span class="font-medium"
+          th:text="${e.dataDevolucao != null ? #temporals.format(e.dataDevolucao, 'dd/MM/yyyy') : '—'}">—</span>
+      </p>
+      <p><span class="text-gray-600">Observação:</span>
+        <span class="font-medium" th:text="${e.observacao != null ? e.observacao : '—'}">—</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="flex justify-end mt-8 space-x-2" th:with="jaDevolvido=${e.dataDevolucao != null}">
+    <!-- Voltar para a origem -->
+    <a th:href="${#strings.isEmpty(back)} ? @{/emprestimo} : ${back}"
+      class="bg-gray-400 text-white px-5 py-2 rounded hover:bg-gray-500">Voltar</a>
+
+    <!-- Devolver: só aparece se ainda não devolvido -->
+    <form th:if="${!jaDevolvido}" th:action="@{/emprestimo/{id}/devolver(id=${e.idEmprestimo})}" method="post"
+      onsubmit="return confirm('Confirmar devolução deste empréstimo?');" class="inline">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+      <input type="hidden" name="back" th:value="${#strings.isEmpty(back) ? '/emprestimo' : back}">
+      <button type="submit" class="bg-[#2e3f52] hover:bg-[#1f2d3a] text-white px-6 py-2 rounded">
+        Devolver
+      </button>
+      
+    </form>
+  </div>
+
+</div>

@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Seus utilitários opcionais:
+@layer utilities {
+  .card-shadow { @apply shadow-md rounded-2xl; }
+}
+*/

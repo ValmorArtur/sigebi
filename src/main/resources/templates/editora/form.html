@@ -1,0 +1,304 @@
+<div th:fragment="conteudo" class="bg-white rounded-lg shadow-md p-6 relative">
+  <!-- Ícone do módulo -->
+  <div th:replace="~{fragments/card-icone :: iconeCard('/img/icon-publisher-azul.png')}"></div>
+
+  <!-- Cabeçalho com título centralizado -->
+  <div class="flex justify-between items-center mb-2">
+    <div class="absolute left-1/2 transform -translate-x-1/2 mt-14">
+      <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+        <span class="relative inline-block">
+          <span class="absolute w-[18px] h-[18px] bg-yellow-400 rounded-sm -left-2 top-[2px] z-0"></span>
+          <span class="relative z-10">E</span>
+        </span><span th:text="${editora.idEditora != null ? 'ditora - Edição' : 'ditora - Inclusão'}"></span>
+      </h1>
+    </div>
+  </div>
+
+  <!-- Linha separadora amarela -->
+  <div class="h-1 bg-yellow-400 mb-4 mt-14 rounded-sm"></div>
+
+  <!-- Mensagens -->
+  <div th:if="${erro}" class="text-red-600 font-semibold mb-4 text-center" th:text="${erro}"></div>
+  <div th:if="${mensagem}"
+    class="bg-green-100 border border-green-400 text-green-800 text-sm font-semibold p-3 rounded mb-4 text-center"
+    th:text="${mensagem}"></div>
+
+  <!-- Formulário -->
+  <form id="formEditora" th:action="@{/editora/salvar}" method="post" th:object="${editora}" class="space-y-4">
+    <!-- CSRF -->
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <input type="hidden" th:field="*{idEditora}" />
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-gray-700 font-semibold">Nome</label>
+        <input th:field="*{nomeEditora}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                      focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-semibold">Telefone</label>
+        <input th:field="*{foneEditora}" id="foneEditora" inputmode="numeric" maxlength="15"
+          placeholder="(00) 00000-0000" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                      focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
+        <small id="alertTelefone"
+          class="hidden text-red-700 bg-red-100 border border-red-400 px-2 py-1 rounded mt-1 inline-block">
+          Telefone inválido.
+        </small>
+      </div>
+
+      <!-- Endereço -->
+      <div>
+        <label class="block text-gray-700 font-semibold">CEP</label>
+        <input th:field="*{cepEditora}" id="cepEditora" inputmode="numeric" maxlength="9" placeholder="00000-000" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                      focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
+        <small id="alertCep"
+          class="hidden text-red-700 bg-red-100 border border-red-400 px-2 py-1 rounded mt-1 inline-block">
+          CEP inválido ou não encontrado.
+        </small>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-semibold">Rua</label>
+        <input th:field="*{ruaEditora}" id="ruaEditora" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                      focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-semibold">Número</label>
+        <input th:field="*{numeroEditora}" id="numeroEditora" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                      focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-semibold">Bairro</label>
+        <input th:field="*{bairroEditora}" id="bairroEditora" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                      focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-semibold">Cidade</label>
+        <input th:field="*{cidadeEditora}" id="cidadeEditora" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                      focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-semibold">Estado</label>
+        <input th:field="*{estadoEditora}" id="estadoEditora" maxlength="2" placeholder="UF" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                      focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400 uppercase" />
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="block text-gray-700 font-semibold">Site</label>
+        <input type="url" th:field="*{siteEditora}" id="siteEditora" placeholder="https://exemplo.com" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
+        <small id="alertSite"
+          class="hidden text-red-700 bg-red-100 border border-red-400 px-2 py-1 rounded mt-1 inline-block">
+          Informe uma URL válida iniciando com http:// ou https://
+        </small>
+        <!-- Erros vindos do back-end (Bean Validation) -->
+        <div class="text-red-600 text-sm" th:if="${#fields.hasErrors('siteEditora')}" th:errors="*{siteEditora}"></div>
+      </div>
+
+      <!-- Ativo: sempre visível -->
+      <div class="flex items-center gap-2">
+        <input th:field="*{ativo}" type="checkbox" class="transform scale-150 accent-blue-800" />
+        <label class="text-gray-700 font-semibold">Ativo</label>
+      </div>
+    </div>
+
+    <!-- Botões -->
+    <div class="flex justify-end mt-8 space-x-2">
+      <button type="reset" class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded">Limpar</button>
+      <a href="/editora"
+        class="bg-gray-400 text-white px-5 py-2 rounded hover:bg-gray-500 inline-flex items-center justify-center">Cancelar</a>
+      <button type="submit" class="bg-[#2d3e50] hover:bg-[#1f2d3a] text-white px-6 py-2 rounded">Salvar</button>
+    </div>
+  </form>
+
+  <!-- Scripts -->
+  <script>
+    // --- Utilitários de máscara ---
+    function maskPhone(v) {
+      v = v.replace(/\D/g, '').slice(0, 11);
+      if (v.length <= 2) return v.replace(/^(\d{0,2}).*/, '($1');
+      if (v.length <= 6) return v.replace(/^(\d{2})(\d{0,4}).*/, '($1) $2');
+      if (v.length <= 10) return v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+      return v.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+    }
+
+    function maskCep(v) {
+      v = v.replace(/\D/g, '').slice(0, 8);
+      if (v.length > 5) return v.replace(/^(\d{5})(\d{0,3}).*/, '$1-$2');
+      return v;
+    }
+
+    function onlyDigits(s) { return (s || '').replace(/\D/g, ''); }
+
+    // --- ViaCEP com debounce ---
+    let cepTimer = null;
+    let lastFetchedCep = '';
+
+    async function fetchViaCep(cepDigits) {
+
+      if (!navigator.onLine) {
+        // se estiver Offline: 
+        console.warn("Sem internet: preencha o endereço manualmente.");
+          alert ("Sem internet: preencha o endereço manualmente.");
+        return; // não chama ViaCEP
+      }
+
+      try {
+        const resp = await fetch(`https://viacep.com.br/ws/${cepDigits}/json/`);
+        const data = await resp.json();
+        if (data.erro) return { ok: false };
+        return {
+          ok: true,
+          rua: data.logradouro || '',
+          bairro: data.bairro || '',
+          cidade: data.localidade || '',
+          uf: data.uf || ''
+        };
+      } catch (e) {
+        console.error('ViaCEP indisponível. Preencha o endereço manualmente.', e);
+        return { ok: false };
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const fone = document.getElementById('foneEditora');
+      const cep = document.getElementById('cepEditora');
+
+      const rua = document.getElementById('ruaEditora');
+      const bairro = document.getElementById('bairroEditora');
+      const cidade = document.getElementById('cidadeEditora');
+      const estado = document.getElementById('estadoEditora');
+
+      const alertCep = document.getElementById('alertCep');
+      const alertTelefone = document.getElementById('alertTelefone');
+
+      // Máscara telefone
+      if (fone) {
+        fone.addEventListener('input', (e) => {
+          const cur = e.target.selectionStart;
+          const before = e.target.value;
+          e.target.value = maskPhone(e.target.value);
+          // validação simples: pelo menos DDD + 8 dígitos
+          const digits = onlyDigits(e.target.value);
+          const valid = digits.length === 10 || digits.length === 11;
+          if (!valid && digits.length > 0) {
+            alertTelefone.classList.remove('hidden');
+          } else {
+            alertTelefone.classList.add('hidden');
+          }
+        });
+      }
+
+      // Máscara e busca automática CEP
+      if (cep) {
+        const tryFetch = async () => {
+          const digits = onlyDigits(cep.value);
+          if (digits.length === 8 && digits !== lastFetchedCep) {
+            lastFetchedCep = digits;
+            alertCep.classList.add('hidden');
+            const res = await fetchViaCep(digits);
+            if (res.ok) {
+              if (rua) rua.value = res.rua;
+              if (bairro) bairro.value = res.bairro;
+              if (cidade) cidade.value = res.cidade;
+              if (estado) estado.value = res.uf;
+            } else {
+              alertCep.classList.remove('hidden');
+            }
+          }
+        };
+
+        cep.addEventListener('input', (e) => {
+          e.target.value = maskCep(e.target.value);
+          clearTimeout(cepTimer);
+          cepTimer = setTimeout(tryFetch, 300); // debounce 300ms
+        });
+
+        cep.addEventListener('blur', tryFetch);
+      }
+
+      // Validação no submit
+      const form = document.getElementById('formEditora');
+      form.addEventListener('submit', function (e) {
+        // CEP: se preenchido, precisa ter 8 dígitos
+        if (cep && cep.value.trim() !== '') {
+          const digits = onlyDigits(cep.value);
+          if (digits.length !== 8) {
+            e.preventDefault();
+            alertCep.classList.remove('hidden');
+            cep.focus();
+            return false;
+          }
+        }
+
+        // Telefone: se preenchido, 10 ou 11 dígitos
+        if (fone && fone.value.trim() !== '') {
+          const digits = onlyDigits(fone.value);
+          const ok = digits.length === 10 || digits.length === 11;
+          if (!ok) {
+            e.preventDefault();
+            alertTelefone.classList.remove('hidden');
+            fone.focus();
+            return false;
+          }
+        }
+      });
+    });
+
+    // --- Normalização/validação de URL ---
+    function normalizeUrl(v) {
+      v = (v || '').trim();
+      if (v === '') return '';
+      // se não começou com http/https, prefixa https://
+      if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
+      return v;
+    }
+
+    function isValidHttpUrl(s) {
+      try {
+        const u = new URL(s);
+        return u.protocol === 'http:' || u.protocol === 'https:';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('formEditora');
+      const site = document.getElementById('siteEditora');
+      const alertSite = document.getElementById('alertSite');
+
+      if (site) {
+        site.addEventListener('blur', () => {
+          const normalized = normalizeUrl(site.value);
+          site.value = normalized;
+          if (normalized && !isValidHttpUrl(normalized)) {
+            alertSite.classList.remove('hidden');
+          } else {
+            alertSite.classList.add('hidden');
+          }
+        });
+      }
+
+      // No submit, valida Site também
+      form.addEventListener('submit', function (e) {
+        if (site && site.value.trim() !== '') {
+          const normalized = normalizeUrl(site.value);
+          site.value = normalized;
+          if (!isValidHttpUrl(normalized)) {
+            e.preventDefault();
+            alertSite.classList.remove('hidden');
+            site.focus();
+            return false;
+          }
+        }
+      });
+    });
+
+  </script>
+</div>

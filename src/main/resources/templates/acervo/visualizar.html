@@ -1,0 +1,118 @@
+<!-- templates/acervo/visualizar.html -->
+<div th:fragment="conteudo" class="bg-white rounded-lg shadow-md p-6 relative">
+    <div th:replace="~{fragments/card-icone :: iconeCard('/img/icon-books-blue.png')}"></div>
+
+    <div class="flex justify-between items-center mb-2">
+        <div class="absolute left-1/2 transform -translate-x-1/2 mt-14">
+            <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+                <span class="relative inline-block">
+                    <span class="absolute w-[18px] h-[18px] bg-yellow-400 rounded-sm -left-2 top-[2px] z-0"></span>
+                    <span class="relative z-10">A</span>
+                </span>
+                <span>cervo - Visualização</span>
+            </h1>
+        </div>
+    </div>
+
+    <div class="h-1 bg-yellow-400 mb-6 mt-14 rounded-sm"></div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <span class="block text-gray-500 text-sm">ISBN</span>
+            <div class="font-semibold" th:text="${acervo.isbn}">-</div>
+        </div>
+
+        <div>
+            <span class="block text-gray-500 text-sm">Título</span>
+            <div class="font-semibold" th:text="${acervo.tituloAcervo}">-</div>
+        </div>
+
+        <div>
+            <span class="block text-gray-500 text-sm">Subtítulo</span>
+            <div class="font-semibold" th:text="${acervo.subTituloAcervo}">-</div>
+        </div>
+
+        <div>
+            <span class="block text-gray-500 text-sm">Edição</span>
+            <div class="font-semibold" th:text="${acervo.numEdicaoAcervo}">-</div>
+        </div>
+
+        <div>
+            <span class="block text-gray-500 text-sm">Ano de Publicação</span>
+            <div class="font-semibold" th:text="${acervo.anoPublicacaoAcervo}">-</div>
+        </div>
+
+        <div>
+            <span class="block text-gray-500 text-sm">Qtd. Páginas</span>
+            <div class="font-semibold" th:text="${acervo.qtdPaginas}">-</div>
+        </div>
+
+        <div>
+            <span class="block text-gray-500 text-sm">Volume</span>
+            <div class="font-semibold" th:text="${acervo.numVolumeAcervo}">-</div>
+        </div>
+
+        <div>
+            <span class="block text-gray-500 text-sm">Cor da Capa</span>
+            <div class="font-semibold" th:text="${acervo.corCapa}">-</div>
+        </div>
+
+        <div>
+            <span class="block text-gray-500 text-sm">Editora</span>
+            <div class="font-semibold" th:text="${acervo.editora != null ? acervo.editora.nomeEditora : '-'}">-</div>
+        </div>
+
+        <div>
+            <span class="block text-gray-500 text-sm">Gênero</span>
+            <div class="font-semibold" th:text="${acervo.genero != null ? acervo.genero.descricao : '-'}">-</div>
+        </div>
+
+        <div>
+            <span class="block text-gray-500 text-sm">Categoria</span>
+            <div class="font-semibold" th:text="${acervo.categoria != null ? acervo.categoria.descricao : '-'}">-</div>
+        </div>
+
+        <div class="md:col-span-2">
+            <span class="block text-gray-500 text-sm">Autor(es)</span>
+            <div class="font-semibold">
+                <span th:if="${#lists.isEmpty(acervo.autores)}">-</span>
+                <span th:each="a, itStat : ${acervo.autores}">
+                    <span th:text="${a.nomeAutor}">Autor</span><span th:if="${!itStat.last}">, </span>
+                </span>
+            </div>
+        </div>
+
+        <div class="md:col-span-2">
+            <span class="block text-gray-500 text-sm">Resumo</span>
+            <div class="font-semibold whitespace-pre-wrap" th:text="${acervo.resumoAcervo}">-</div>
+        </div>
+
+        <div class="md:col-span-2 flex gap-6">
+            <div>
+                <span class="block text-gray-500 text-sm">Proibido para menores</span>
+                <div class="font-semibold" th:text="${acervo.proibidoMenor} ? 'Sim' : 'Não'">Não</div>
+            </div>
+            <div>
+                <span class="block text-gray-500 text-sm">Status</span>
+                <div class="font-semibold" th:text="${acervo.ativo} ? 'Ativo' : 'Inativo'">Ativo</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-end mt-8 space-x-2">
+        <a href="/acervo" class="bg-gray-400 text-white px-5 py-2 rounded hover:bg-gray-500">Voltar</a>
+
+        <!-- Só ADMIN enxerga o link clicável -->
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{|/acervo/editar/${acervo.idAcervo}|}"
+            class="bg-[#2e3f52] hover:bg-[#1f2d3a] text-white px-6 py-2 rounded">
+            Editar
+        </a>
+
+        <!-- Quem NÃO for ADMIN vê o botão desabilitado (não clicável) -->
+        <button sec:authorize="!hasRole('ADMIN')" type="button"
+            class="bg-[#2e3f52] text-white px-6 py-2 rounded opacity-50 cursor-not-allowed" disabled>
+            Editar
+        </button>
+    </div>
+
+</div>

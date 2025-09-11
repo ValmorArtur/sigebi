@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-br"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+
+<head>
+  <meta charset="UTF-8">
+  <title>Página Principal</title>
+  <link rel="stylesheet" th:href="@{/css/tailwind.css}">
+
+
+  <link rel="stylesheet" th:href="@{/webjars/tom-select/dist/css/tom-select.css}">
+  <script defer th:src="@{/webjars/tom-select/dist/js/tom-select.complete.min.js}"></script>
+
+  <style>
+    /* Largura do aside quando colapsado */
+    #sidebar.collapsed {
+      width: 4rem !important;
+    }
+
+    /* Some apenas os textos (mantém ícones) */
+    #sidebar.collapsed .menu-label {
+      display: none !important;
+    }
+
+    /* Remove indentação quando colapsado */
+    #sidebar.collapsed .ml-6 {
+      margin-left: 0 !important;
+    }
+
+    /* Centraliza os conteúdos dos links/botões no estado colapsado */
+    #sidebar.collapsed nav a,
+    #sidebar.collapsed #livrosToggle {
+      justify-content: center !important;
+    }
+
+    /* Remove o espaçamento à direita dos ícones */
+    #sidebar.collapsed img[class*="mr-"] {
+      margin-right: 0 !important;
+    }
+
+    /* No colapsado, esconda apenas o chevron (não o dropdown) */
+    #sidebar.collapsed #userMenuChevron {
+      display: none !important;
+    }
+
+    /* Quando colapsado, apenas reposicione o dropdown para fora do aside */
+    #sidebar.collapsed #userMenuDropdown {
+      left: 3.25rem !important;
+      /* ~52px, fica ao lado do menu */
+    }
+
+    /* Esconde a seta (chevron) do "Acervo" somente quando o aside estiver colapsado */
+    #sidebar.collapsed #livrosChevron {
+      display: none !important;
+    }
+
+    /* Centraliza o botão do Acervo no colapsado (sem espaço da seta) */
+    #sidebar.collapsed #livrosToggle {
+      justify-content: center !important;
+      padding-left: .5rem !important;
+      padding-right: .5rem !important;
+    }
+
+    /* Popout do submenu deve abrir ao lado do aside quando colapsado */
+    #sidebar.collapsed #submenuLivros {
+      left: 3.25rem !important;
+      /* ~52px */
+    }
+
+    /* Ajusta a posição do submenu quando o aside está estreito */
+    #sidebar.collapsed #submenuLivros {
+      left: 3.25rem !important;
+    }
+
+    #sidebar.collapsed #submenuLivros .submenu-link {
+      justify-content: flex-start !important;
+    }
+
+    #sidebar.collapsed #userMenuBtn {
+      justify-content: center !important;
+      padding-left: .5rem !important;
+      padding-right: .5rem !important;
+    }
+
+    /* remove o espaço interno do grupo (era gap-3 no HTML) */
+    #sidebar.collapsed #userMenuBtn .flex.gap-3 {
+      gap: 0 !important;
+    }
+
+    /* garante que apenas o ícone fique visível */
+    #sidebar.collapsed #userMenuBtn .menu-label {
+      display: none !important;
+    }
+
+    #sidebar.collapsed #userMenuChevron {
+      display: none !important;
+    }
+
+    /* tira margem à direita caso algum ícone tenha mr-* */
+    #sidebar.collapsed #userMenuBtn img {
+      margin-right: 0 !important;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-stretch" th:attr="data-api-autores=@{/api/autores}">
+  <!-- Menu Lateral -->
+  <th:block th:replace="~{fragments/menu-lateral :: menuLateral}"></th:block>
+
+  <!-- Conteúdo principal dinâmico -->
+  <main class="relative flex-1 p-10">
+
+    <div class="mb-4">
+      <button id="sidebarToggleBtn" class="absolute top-2 left-4 h-8 w-8 border border-gray-300 rounded flex items-center justify-center
+                 bg-white hover:bg-gray-100" aria-label="Alternar menu lateral" title="Alternar menu">
+        <!-- ícone 3 pontos verticais -->
+        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path
+            d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 5.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 5.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" />
+        </svg>
+      </button>
+    </div>
+    <div th:replace="~{__${conteudo}__}"></div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // ====== MENU DO USUÁRIO ======
+      const btn = document.getElementById("userMenuBtn");
+      const dropdown = document.getElementById("userMenuDropdown");
+      const chevron = document.getElementById("userMenuChevron");
+
+      function closeMenu() {
+        if (!dropdown) return;
+        dropdown.classList.add("hidden");
+        btn?.setAttribute("aria-expanded", "false");
+        chevron?.classList.remove("rotate-180");
+      }
+      function toggleMenu(e) {
+        if (!btn || !dropdown) return;
+        e.stopPropagation();
+        const isHidden = dropdown.classList.contains("hidden");
+        if (isHidden) {
+          dropdown.classList.remove("hidden");
+          btn.setAttribute("aria-expanded", "true");
+          chevron?.classList.add("rotate-180");
+        } else {
+          closeMenu();
+        }
+      }
+      btn?.addEventListener("click", toggleMenu);
+      document.addEventListener("click", (e) => {
+        if (dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+          closeMenu();
+        }
+      });
+
+      // ====== SUBMENU LIVROS ======
+      const livrosToggle = document.getElementById("livrosToggle");
+      const submenuLivros = document.getElementById("submenuLivros");
+      const livrosChevron = document.getElementById("livrosChevron");
+      const linkAnims = submenuLivros ? submenuLivros.querySelectorAll(".submenu-link") : [];
+
+      function openSubmenu() {
+        if (!submenuLivros) return;
+        submenuLivros.classList.remove("hidden");
+        void submenuLivros.offsetWidth; // força recálculo p/ animação
+        submenuLivros.classList.remove("opacity-0", "scale-95");
+        submenuLivros.classList.add("opacity-100", "scale-100");
+        livrosToggle?.setAttribute("aria-expanded", "true");
+        livrosChevron?.classList.add("rotate-180");
+        linkAnims.forEach(a => {
+          a.classList.remove("opacity-0", "translate-y-1");
+          a.classList.add("opacity-100", "translate-y-0");
+        });
+      }
+      function closeSubmenu() {
+        if (!submenuLivros) return;
+        linkAnims.forEach(a => {
+          a.classList.add("opacity-0", "translate-y-1");
+          a.classList.remove("opacity-100", "translate-y-0");
+        });
+        submenuLivros.classList.add("opacity-0", "scale-95");
+        submenuLivros.classList.remove("opacity-100", "scale-100");
+        livrosToggle?.setAttribute("aria-expanded", "false");
+        livrosChevron?.classList.remove("rotate-180");
+        setTimeout(() => submenuLivros.classList.add("hidden"), 150);
+      }
+      function toggleSubmenu(e) {
+        e.stopPropagation();
+        if (!submenuLivros) return;
+        const closed = submenuLivros.classList.contains("hidden") ||
+          submenuLivros.classList.contains("opacity-0");
+        closed ? openSubmenu() : closeSubmenu();
+      }
+      livrosToggle?.addEventListener("click", toggleSubmenu);
+
+      // Abre auto se a rota for de Livros
+      const path = location.pathname || "";
+      if (["/acervo", "/exemplar", "/categoria", "/genero", "/autor"].some(p => path.startsWith(p))) {
+        openSubmenu();
+      }
+      // Marca link ativo
+      linkAnims.forEach(a => {
+        if (a.getAttribute("href") && path.startsWith(a.getAttribute("href"))) {
+          a.classList.add("bg-white/15", "relative",
+            "before:absolute", "before:left-0", "before:top-0", "before:h-full", "before:w-1", "before:bg-yellow-400");
+        }
+      });
+      // Fecha clicando fora
+      document.addEventListener("click", (e) => {
+        if (submenuLivros && livrosToggle &&
+          !submenuLivros.contains(e.target) && !livrosToggle.contains(e.target)) {
+          closeSubmenu();
+        }
+      });
+
+      // ====== ESC FECHA AMBOS ======
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeMenu();
+          closeSubmenu();
+        }
+      });
+
+      // ====== TOGGLE DO ASIDE (⋮) ======
+      const sidebar = document.getElementById("sidebar");
+      const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
+
+      function setSidebarCollapsed(collapsed) {
+        if (!sidebar) return;
+        if (collapsed) {
+          sidebar.classList.add("collapsed");
+          // persiste a escolha do usuário
+          try { localStorage.setItem("sidebar-collapsed", "1"); } catch { }
+        } else {
+          sidebar.classList.remove("collapsed");
+          try { localStorage.removeItem("sidebar-collapsed"); } catch { }
+        }
+      }
+
+      // estado inicial (restaura preferido)
+      try {
+        const saved = localStorage.getItem("sidebar-collapsed") === "1";
+        setSidebarCollapsed(saved);
+      } catch { }
+
+      // click no botão ⋮
+      sidebarToggleBtn?.addEventListener("click", () => {
+        setSidebarCollapsed(!sidebar.classList.contains("collapsed"));
+      });
+
+    });
+  </script>
+
+</body>
+
+</html>

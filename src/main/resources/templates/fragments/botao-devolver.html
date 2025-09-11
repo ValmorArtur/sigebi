@@ -1,0 +1,12 @@
+<!-- fragments/botao-emprestar.html -->
+<div th:fragment="botao(rota, tooltip, tamanho)">
+  <div sec:authorize="hasRole('ADMIN')"></div>
+  <a th:href="@{__${rota}__}" th:title="${tooltip}" class="text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg
+                  transition duration-200 ease-in-out transform hover:scale-110"
+    style="background-color: rgb(46, 63, 82);">
+
+    <!-- Ícone PNG  -->
+    <img src="/img/icon-return-azul.png" th:classappend="${tamanho == 'grande'} ? ' w-12 h-12' : ' w-4 h-4'"
+      alt="Emprestar">
+  </a>
+</div>

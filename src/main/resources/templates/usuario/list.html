@@ -1,0 +1,91 @@
+<div th:fragment="conteudo" class="bg-white rounded-lg shadow-md p-6 relative">
+  <!-- Ícone do módulo -->
+  <div th:replace="~{fragments/card-icone :: iconeCard('/img/icon-user-azul.png')}"></div>
+
+  <!-- Cabeçalho com título centralizado, busca e botão -->
+  <div class="flex justify-between items-center mb-2">
+
+    <!-- Título centralizado -->
+    <div class="absolute left-1/2 transform -translate-x-1/2">
+      <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+        <span class="relative inline-block">
+          <span class="absolute w-[18px] h-[18px] bg-yellow-400 rounded-sm -left-2 top-[2px] z-0"></span>
+          <span class="relative z-10">U</span>
+        </span>suários
+      </h1>
+    </div>
+
+    <!-- Busca + botão -->
+    <div class="flex space-x-4 ml-auto">
+      <!-- Formulário de busca -->
+      <form class="relative mt-2" method="get" th:action="@{/usuario}">
+        <input type="text" name="filtro" placeholder="Buscar..." th:value="${filtro}"
+          class="w-48 pl-10 pr-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-yellow-400 focus:border-yellow-400">
+        <button type="submit">
+          <img src="/img/search-icon.png" class="w-5 h-5 absolute left-3 top-2.5 opacity-50" alt="Buscar">
+        </button>
+      </form>
+
+
+      <!-- Botão de adicionar -->
+      <div th:replace="~{fragments/botao-incluir :: botao('/usuario/novo', 'Novo Usuário')}"></div>
+    </div>
+
+  </div>
+
+  <!-- Linha separadora amarela -->
+  <div class="h-1 bg-yellow-400 mb-4 rounded-sm"></div>
+
+  <!-- Mensagens -->
+  <!--<div th:if="${mensagem}" class="text-green-600 font-semibold mb-4 text-center" th:text="${mensagem}"></div>-->
+  <div th:if="${erro}" class="text-red-600 font-semibold mb-4 text-center" th:text="${erro}"></div>
+
+  <!-- Tabela -->
+  <div class="overflow-x-auto">
+    <table id="tabelaUsuarios" class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
+      <thead class="bg-gray-300">
+        <tr>
+          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">ID</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nome</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Fone</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Administrador
+          </th>
+          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Situação</th>
+          <th class="px-4 py-2 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Ações</th>
+        </tr>
+      </thead>
+      <tbody th:each="usuario, iterStat : ${usuarios}" class="divide-y divide-gray-200">
+        <tr th:class="${iterStat.index % 2 == 0} ? 'bg-white' : 'bg-gray-200'">
+          <td class="px-4 py-1" th:text="${usuario.idUsuario}"></td>
+          <td class="px-4 py-1" th:text="${usuario.nomeUsuario}"></td>
+          <td class="px-4 py-1" th:text="${usuario.emailUsuario}"></td>
+          <td class="px-4 py-1" th:text="${usuario.foneUsuario}"></td>
+          <td class="px-4 py-1" th:text="${usuario.administradorFormatado}"></td>
+          <td class="px-4 py-1" th:text="${usuario.ativoFormatado}"></td>
+          <td class="px-4 py-1 text-center space-x-2">
+            <div th:replace="~{fragments/botoes-acoes :: acoes(
+                '/usuario/visualizar/' + ${usuario.idUsuario}, 'Visualizar Usuário', false, true,
+                '/usuario/editar/' + ${usuario.idUsuario}, 'Editar Usuário', true,
+                '/usuario/excluir/' + ${usuario.idUsuario}, 'Excluir Usuário', true,
+                '/usuario/ativar/' + ${usuario.idUsuario}, ${usuario.ativo}, true
+                )}">
+            </div> <!-- Primeiro parâmetro true ou false: se vai ou não mostrar o botão-->
+                   <!-- Segundo parâmetro true ou false se apenas admin vai ver (apenasAdminVisualizar) -->
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginação dinâmica -->
+  <div th:replace="~{fragments/paginacao :: paginacao(
+    '/usuario', ${currentPage}, ${totalPages}, ${filtro}, ${null}, ${null})}">
+  </div>
+  
+  <a href="/" class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded
+          block w-fit mx-auto mt-6 text-center">
+    Página Inicial
+  </a>
+</div>
