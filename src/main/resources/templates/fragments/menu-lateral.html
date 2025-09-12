@@ -165,12 +165,8 @@
             <hr class="border-t-[1px] border-[#6C6C6D] mt-0 mb-4">
         </div>
 
-        <div sec:authorize="hasRole('ADMIN')">  
-            <!-- Devoluções -->
-                       
+        <div sec:authorize="hasRole('ADMIN')"> 
             <hr class="border-t-[1px] border-[#6C6C6D] mt-0 mb-0">
-            <!-- Devoluções -->
-
             <!-- Devoluções -->
             <a href="/devolucao" th:classappend="${#strings.startsWith(uri,'/devolucao')} ? 'bg-[#1f2d3a]' : ''"
                 class="flex items-center px-4 py-3 hover:bg-[#1f2d3a]">
