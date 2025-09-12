@@ -166,7 +166,6 @@
         </div>
 
         <div sec:authorize="hasRole('ADMIN')"> 
-            <!-- Devoluções -->
             <hr class="border-t-[1px] border-[#6C6C6D] mt-0 mb-0">
             <!-- Devoluções -->
             <a href="/devolucao" th:classappend="${#strings.startsWith(uri,'/devolucao')} ? 'bg-[#1f2d3a]' : ''"
