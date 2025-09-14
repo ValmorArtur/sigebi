@@ -52,12 +52,14 @@
                     required>
             </div>
 
-            <div class="mb-4">
+            <!--<div class="mb-4">-->
+            <div class="mb-4 relative pb-5">
                 <label class="block text-sm font-medium text-gray-700">CPF</label>
                 <input type="text" th:field="*{cpf}" id="cpf" placeholder="000.000.000-00" maxlength="14"
                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400"
                     required>
-                <p id="erroCPF" class="mensagem-erro hidden">CPF inválido</p>
+                <p id="erroCPF" class="text-red-600 text-sm leading-5 h-5 whitespace-nowrap overflow-hidden text-ellipsis hidden
+                    absolute left-0 bottom-0">CPF inválido</p>
             </div>
 
             <div class="mb-4">
@@ -67,19 +69,25 @@
                     required>
             </div>
 
-            <div class="mb-4">
+            <!--<div class="mb-4">   mensagem-erro hidden-->
+            <div class="mb-4 relative pb-5">
                 <label class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" th:field="*{emailUsuario}" placeholder="Digite seu e-mail"
+                <input type="email" th:field="*{emailUsuario}" id="emailUsuario" placeholder="Digite seu e-mail"
                     pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400"
                     required>
-                <p id="erroEmail" class="mensagem-erro hidden">E-mail inválido</p>
+                <p id="erroEmail" class="mensagem-erro hidden text-red-600 text-sm leading-5 h-5 whitespace-nowrap text-ellipsis
+                    left-0 bottom-0">E-mail inválido</p>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-4 relative pb-5">
                 <label class="block text-sm font-medium text-gray-700">Telefone</label>
-                <input type="text" th:field="*{foneUsuario}" placeholder="(99) 99999-9999"
+                <input type="text" th:field="*{foneUsuario}" id="foneUsuario" placeholder="(99) 99999-9999"
+                    maxlength="15"
                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
+                <p id="erroTelefone" class="mensagem-erro hidden text-red-600 text-sm leading-5 h-5 whitespace-nowrap text-ellipsis
+                    left-0 bottom-0">Telefone inválido</p>
+
             </div>
 
             <div class="mb-4 relative">
@@ -118,6 +126,7 @@
 
     <!-- Scripts -->
     <script>
+        // ===== UTILITÁRIOS =====
         function toggleSenhaImagem(inputId, iconId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(iconId);
@@ -125,18 +134,22 @@
             icon.src = input.type === "password" ? "/img/eye-open.png" : "/img/eye-closed.png";
         }
 
+        function somenteDigitos(e) {
+            const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
+            if (allowed.includes(e.key)) return;
+            if (!/\d/.test(e.key)) e.preventDefault();
+        }
+
         function validarCPF(cpf) {
             cpf = cpf.replace(/[^\d]+/g, '');
             if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
             let soma = 0;
             for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
-            let resto = 11 - (soma % 11);
-            if (resto >= 10) resto = 0;
+            let resto = 11 - (soma % 11); if (resto >= 10) resto = 0;
             if (resto !== parseInt(cpf.charAt(9))) return false;
             soma = 0;
             for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
-            resto = 11 - (soma % 11);
-            if (resto >= 10) resto = 0;
+            resto = 11 - (soma % 11); if (resto >= 10) resto = 0;
             return resto === parseInt(cpf.charAt(10));
         }
 
@@ -148,18 +161,35 @@
                 .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
         }
 
-        function aplicarMascaraTelefone(input) {
-            input.value = input.value
-                .replace(/\D/g, '')
-                .replace(/(\d{2})(\d)/, '($1) $2')
-                .replace(/(\d{5})(\d)/, '$1-$2')
-                .replace(/(-\d{4})\d+?$/, '$1');
+        // máscara dinâmica: (99) 9999-9999 ou (99) 99999-9999
+        function aplicarMascaraTelefoneDinamica(el) {
+            const d = el.value.replace(/\D/g, '');
+            if (d.length <= 10) {
+                el.value = d.replace(/^(\d{0,2})(\d{0,4})(\d{0,4}).*$/, (m, a, b, c) =>
+                    [a ? `(${a}` : '', a && a.length === 2 ? ') ' : '', b, b && c ? '-' : '', c].join('')
+                );
+            } else {
+                el.value = d.replace(/^(\d{0,2})(\d{0,5})(\d{0,4}).*$/, (m, a, b, c) =>
+                    [a ? `(${a}` : '', a && a.length === 2 ? ') ' : '', b, b && c ? '-' : '', c].join('')
+                );
+            }
         }
 
-        function validarEmail(email) {
+        function validarEmailSimples(email) {
             const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return regex.test(email);
         }
+
+        function mostrarErro(input, pMsg, msg) {
+            input.classList.add("border-red-500");
+            if (pMsg) { pMsg.textContent = msg; pMsg.classList.remove("hidden"); }
+        }
+
+        function limparErro(input, pMsg) {
+            input.classList.remove("border-red-500");
+            if (pMsg) pMsg.classList.add("hidden");
+        }
+        // ===== FIM UTILITÁRIOS =====
 
         document.addEventListener("DOMContentLoaded", function () {
             const senha = document.getElementById("senha");
@@ -167,17 +197,22 @@
             const msgErroSenha = document.getElementById("erroSenha");
 
             const cpfInput = document.getElementById("cpf");
-            const telefoneInput = document.querySelector('input[th\\:field="*{foneUsuario}"]');
-            const emailInput = document.querySelector('input[th\\:field="*{emailUsuario}"]');
+            const telefoneInput = document.getElementById("foneUsuario");
+            const emailInput = document.getElementById("emailUsuario");
 
             const msgErroCpf = document.getElementById("erroCPF");
             const msgErroEmail = document.getElementById("erroEmail");
+            const msgErroTelefone = document.getElementById("erroTelefone");
 
-            // Máscaras
+            // Somente números (teclado)
+            cpfInput.addEventListener("keydown", somenteDigitos);
+            telefoneInput.addEventListener("keydown", somenteDigitos);
+
+            // Máscaras (digitando/colando)
             cpfInput.addEventListener("input", () => aplicarMascaraCPF(cpfInput));
-            telefoneInput.addEventListener("input", () => aplicarMascaraTelefone(telefoneInput));
+            telefoneInput.addEventListener("input", () => aplicarMascaraTelefoneDinamica(telefoneInput));
 
-            // Validação de senha
+            // Validação de senha (tempo real)
             confirmar.addEventListener("input", function () {
                 if (senha.value !== confirmar.value) {
                     confirmar.classList.add("border-red-500");
@@ -188,7 +223,55 @@
                 }
             });
 
-            // Validação completa ao enviar
+            // Blur + foco de volta se inválido
+            cpfInput.addEventListener("blur", () => {
+                const valor = cpfInput.value.trim();
+                if (valor === "") {
+                    // vazio: não valida no blur; apenas limpa qualquer erro visual
+                    limparErro(cpfInput, msgErroCpf);
+                    return;
+                }
+
+                const digits = valor.replace(/\D/g, '');
+                if (digits.length !== 11 || !validarCPF(valor)) {
+                    mostrarErro(cpfInput, msgErroCpf, "CPF inválido. Digite 11 números válidos.");
+                    setTimeout(() => { cpfInput.focus(); cpfInput.select(); }, 0);
+                } else {
+                    limparErro(cpfInput, msgErroCpf);
+                }
+            });
+
+            telefoneInput.addEventListener("blur", () => {
+                const valor = telefoneInput.value.trim();
+                if (valor === "") {
+                    limparErro(telefoneInput, msgErroTelefone);
+                    return;
+                }
+
+                const digits = valor.replace(/\D/g, '');
+                if (!(digits.length === 10 || digits.length === 11)) {
+                    mostrarErro(telefoneInput, msgErroTelefone, "Telefone inválido. Use DDD + número (10 ou 11 dígitos).");
+                    setTimeout(() => { telefoneInput.focus(); telefoneInput.select(); }, 0);
+                } else {
+                    limparErro(telefoneInput, msgErroTelefone);
+                }
+            });
+
+            emailInput.addEventListener("blur", () => {
+                const valor = emailInput.value.trim();
+                if (valor === "") {
+                    limparErro(emailInput, msgErroEmail);
+                    return;
+                }
+
+                if (!validarEmailSimples(valor)) {
+                    mostrarErro(emailInput, msgErroEmail, "E-mail inválido. Verifique o formato (ex.: nome@dominio.com).");
+                    setTimeout(() => { emailInput.focus(); emailInput.select(); }, 0);
+                } else {
+                    limparErro(emailInput, msgErroEmail);
+                }
+            });
+
             document.querySelector("form").addEventListener("submit", function (e) {
                 let erro = false;
 
@@ -203,23 +286,29 @@
                 }
 
                 // CPF
-                if (!validarCPF(cpfInput.value)) {
-                    cpfInput.classList.add("border-red-500");
-                    msgErroCpf.classList.remove("hidden");
+                const digitsCPF = cpfInput.value.replace(/\D/g, '');
+                if (digitsCPF.length !== 11 || !validarCPF(cpfInput.value)) {
+                    mostrarErro(cpfInput, msgErroCpf, "CPF inválido. Digite 11 números válidos.");
                     erro = true;
                 } else {
-                    cpfInput.classList.remove("border-red-500");
-                    msgErroCpf.classList.add("hidden");
+                    limparErro(cpfInput, msgErroCpf);
                 }
 
-                // Email
-                if (!validarEmail(emailInput.value)) {
-                    emailInput.classList.add("border-red-500");
-                    msgErroEmail.classList.remove("hidden");
+                // Telefone
+                const digitsTel = telefoneInput.value.replace(/\D/g, '');
+                if (!(digitsTel.length === 10 || digitsTel.length === 11)) {
+                    mostrarErro(telefoneInput, msgErroTelefone, "Telefone inválido. Use DDD + número (10 ou 11 dígitos).");
                     erro = true;
                 } else {
-                    emailInput.classList.remove("border-red-500");
-                    msgErroEmail.classList.add("hidden");
+                    limparErro(telefoneInput, msgErroTelefone);
+                }
+
+                // E-mail
+                if (!validarEmailSimples(emailInput.value)) {
+                    mostrarErro(emailInput, msgErroEmail, "E-mail inválido. Verifique o formato (ex.: nome@dominio.com).");
+                    erro = true;
+                } else {
+                    limparErro(emailInput, msgErroEmail);
                 }
 
                 if (erro) e.preventDefault();
@@ -228,4 +317,5 @@
     </script>
 
 </body>
+
 </html>
