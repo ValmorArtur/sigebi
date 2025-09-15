@@ -1,0 +1,89 @@
+<!-- templates/emprestimo/renovar.html -->
+<div th:fragment="conteudo" class="bg-white rounded-lg shadow-md p-6 relative">
+
+    <!-- Ícone do módulo -->
+    <div th:replace="~{fragments/card-icone :: iconeCard('/img/icon-renovar.png')}"></div>
+
+    <!-- Cabeçalho (mesmo padrão) -->
+    <div class="flex justify-between items-center mb-2">
+        <div class="absolute left-1/2 transform -translate-x-1/2 mt-14">
+            <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+                <span class="relative inline-block">
+                    <span class="absolute w-[18px] h-[18px] bg-yellow-400 rounded-sm -left-2 top-[2px] z-0"></span>
+                    <span class="relative z-10">R</span>
+                </span>enovar Empréstimo
+            </h1>
+        </div>
+    </div>
+
+    <div class="h-1 bg-yellow-400 mb-4 mt-14 rounded-sm"></div>
+
+    <!-- Form -->
+    <form th:action="@{'/emprestimo/' + ${emprestimo.idEmprestimo} + '/renovar'}" method="post" class="space-y-4">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <input type="hidden" name="back" th:value="${back}">
+
+        <!-- Exemplar (somente leitura visual) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Tombo</label>
+                <div class="mt-1 px-3 py-2 bg-gray-100 rounded border border-gray-200">
+                    <span th:text="${emprestimo.exemplar != null ? emprestimo.exemplar.idTombo : '-'}">-</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Título</label>
+                <div class="mt-1 px-3 py-2 bg-gray-100 rounded border border-gray-200">
+                    <span
+                        th:text="${(emprestimo.exemplar != null && emprestimo.exemplar.acervo != null) ? emprestimo.exemplar.acervo.tituloAcervo : '-'}">-</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Usuário</label>
+                <div class="mt-1 px-3 py-2 bg-gray-100 rounded border border-gray-200">
+                    <span th:text="${emprestimo.usuario != null ? emprestimo.usuario.loginUsuario : '-'}">-</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Emprestado em</label>
+                <div class="mt-1 px-3 py-2 bg-gray-100 rounded border border-gray-200">
+                    <span
+                        th:text="${emprestimo.dataEmprestimo != null ? #temporals.format(emprestimo.dataEmprestimo, 'dd/MM/yyyy') : '-'}">-</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Devolver até (atual)</label>
+                <div class="mt-1 px-3 py-2 bg-gray-100 rounded border border-gray-200">
+                    <span
+                        th:text="${emprestimo.dataPrevistaDevolucao != null ? #temporals.format(emprestimo.dataPrevistaDevolucao, 'dd/MM/yyyy') : '-'}">-</span>
+                </div>
+            </div>
+
+            <div>
+                <label for="dataPrevistaDevolucao" class="block text-sm font-medium text-gray-700">Nova “Devolver até”</label>
+                <input id="dataPrevistaDevolucao" name="dataPrevistaDevolucao" type="date" required
+                    th:value="${novaPrevista != null ? #temporals.format(novaPrevista, 'yyyy-MM-dd') : ''}"
+                    class="mt-1 block w-full rounded-md border border-gray-200 bg-gray-100 px-3 py-2 text-gray-800 shadow-sm focus:border-yellow-400 focus:ring-yellow-400" />
+            </div>
+        </div>
+
+        <div>
+            <label for="observacao" class="block text-sm font-medium text-gray-700">Observação</label>
+            <textarea id="observacao" name="observacao" rows="3"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-400 focus:ring-yellow-400"
+                th:text="${emprestimo.observacao}"></textarea>
+        </div>
+
+        <!-- Ações -->
+        <div class="flex items-center justify-end gap-2 pt-2">
+            <a th:href="${back != null && #strings.length(back) > 0 ? back : '/emprestimo'}"
+                class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</a>
+
+            <button type="submit" class="bg-[#2e3f52] hover:bg-[#1f2d3a] text-white px-6 py-2 rounded">Salvar Renovação</button>
+        </div>
+    </form>
+</div>

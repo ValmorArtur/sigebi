@@ -13,6 +13,7 @@ import com.biblioteca.model.enums.SituacaoExemplar;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriUtils;
 import java.nio.charset.StandardCharsets;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -57,7 +58,7 @@ public class EmprestimoController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", pagina.getTotalPages());
         model.addAttribute("filtro", filtro);
-        model.addAttribute("pageSize", size); 
+        model.addAttribute("pageSize", size);
 
         model.addAttribute("titulo", "Devoluções");
         model.addAttribute("conteudo", "devolucao/list :: conteudo");
@@ -168,6 +169,50 @@ public class EmprestimoController {
 
             return "redirect:/emprestimo/novo" + qs;
         }
+    }
+
+    // Tela de Renovação (pré-carrega dados do empréstimo ativo)
+    @GetMapping("/emprestimo/{id}/renovar")
+    public String renovarForm(@PathVariable Integer id,
+            @RequestParam(required = false) String back,
+            Model model,
+            RedirectAttributes ra) {
+        return emprestimoRepo.findByIdEmprestimoAndDataDevolucaoIsNull(id)
+                .map(e -> {
+                    // Sugestão de data: +7 dias a partir da data prevista atual, senão hoje+7
+                    LocalDate sugerida = (e.getDataPrevistaDevolucao() != null)
+                            ? e.getDataPrevistaDevolucao().plusDays(7)
+                            : LocalDate.now().plusDays(7);
+
+                    model.addAttribute("emprestimo", e);
+                    model.addAttribute("novaPrevista", sugerida);
+                    model.addAttribute("titulo", "Renovar Empréstimo");
+                    model.addAttribute("back", back);
+                    model.addAttribute("conteudo", "emprestimo/renovar :: conteudo");
+                    return "principal";
+                })
+                .orElseGet(() -> {
+                    ra.addFlashAttribute("erro", "Somente empréstimos ativos podem ser renovados.");
+                    return "redirect:/emprestimo";
+                });
+    }
+
+    // Efetiva a renovação: devolve o atual e abre um novo
+    @PostMapping("/emprestimo/{id}/renovar")
+    public String renovarSalvar(@PathVariable Integer id,
+            @RequestParam(name = "dataPrevistaDevolucao", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate novaPrevista,
+            @RequestParam(required = false) String observacao,
+            @RequestParam(required = false) String back,
+            RedirectAttributes ra) {
+        try {
+            Emprestimo novo = service.renovar(id, novaPrevista, observacao);
+            ra.addFlashAttribute("sucesso", "Empréstimo renovado com sucesso! Novo ID: " + novo.getIdEmprestimo());
+        } catch (Exception ex) {
+            ra.addFlashAttribute("erro", "Não foi possível renovar: " + ex.getMessage());
+        }
+        return (StringUtils.hasText(back)
+                ? "redirect:" + UriUtils.encodePath(back, StandardCharsets.UTF_8)
+                : "redirect:/emprestimo");
     }
 
     @PostMapping("/emprestimo/{id}/devolver")

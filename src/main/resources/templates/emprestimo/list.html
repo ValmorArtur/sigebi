@@ -85,12 +85,12 @@
 
               <!-- DEVOLVER (POST; só enquanto ativo) -->
               <form th:if="${it.dataDevolucao == null}" th:action="@{'/emprestimo/' + ${it.idEmprestimo} + '/devolver'}"
-                method="post" class="inline"
-                                onsubmit="return confirm('Confirmar devolução deste empréstimo?');">
+                method="post" class="inline" onsubmit="return confirm('Confirmar devolução deste empréstimo?');">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                 <input type="hidden" name="back" th:value="${urlBack}">
                 <button type="submit" class="text-white rounded-full flex items-center justify-center shadow-lg
-                  transition duration-200 ease-in-out transform hover:scale-110" style="background-color: rgb(46, 63, 82);"
+                  transition duration-200 ease-in-out transform hover:scale-110"
+                  style="background-color: rgb(46, 63, 82);"
                   th:classappend="${tamanho == 'grande'} ? ' w-12 h-12' : ' w-8 h-8'" title="Devolver">
                   <!-- ícone (seta de retorno) -->
                   <img src="/img/icon-return-azul.png"
@@ -107,6 +107,16 @@
                 ${null}, ${false}, false)}">
               </div>
 
+              <!-- [NOVO] RENOVAR (GET: abre tela de renovação) -->
+              <a th:if="${it.dataDevolucao == null}"
+                th:href="@{'/emprestimo/' + ${it.idEmprestimo} + '/renovar'(back=${urlBack})}"
+                title="Renovar Empréstimo" class="text-white rounded-full flex items-center justify-center shadow-lg
+                  transition duration-200 ease-in-out transform hover:scale-110" style="background-color: rgb(46, 63, 82);"
+                th:classappend="${tamanho == 'grande'} ? ' w-12 h-12' : ' w-8 h-8'">
+                <!-- Ícone: reutilizamos o ícone de 'emprestar' -->
+                <img src="/img/icon-renovar.png" th:classappend="${tamanho == 'grande'} ? ' w-12 h-12' : ' w-4 h-4'"
+                  alt="Renovar">
+              </a>
             </div>
           </td>
         </tr>

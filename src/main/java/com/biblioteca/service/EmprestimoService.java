@@ -111,4 +111,26 @@ public class EmprestimoService {
 
         emprestimoRepo.save(e);
     }
+
+    // [NOVO] Renova um empréstimo ativo: encerra o atual e abre um novo para o
+    // mesmo exemplar/usuário
+    @Transactional
+    public Emprestimo renovar(Integer idEmprestimo, LocalDate novaPrevista, String observacao) {
+        // Garante que o empréstimo a renovar está ATIVO
+        Emprestimo atual = emprestimoRepo.findByIdEmprestimoAndDataDevolucaoIsNull(idEmprestimo)
+                .orElseThrow(() -> new IllegalArgumentException("Empréstimo não está ativo."));
+
+        // Dados do empréstimo atual
+        String idTombo = atual.getExemplar().getIdTombo();
+        Integer idUsuario = atual.getUsuario().getIdUsuario();
+
+        // Devolve o empréstimo atual (isso marca dataDevolucao = hoje e coloca
+        // exemplar como DISPONIVEL)
+        devolver(idEmprestimo);
+
+        // Cria um NOVO empréstimo para o mesmo exemplar/usuário (emprestar já setará
+        // EMPRESTADO)
+        return emprestar(idTombo, idUsuario, novaPrevista, observacao);
+    }
+
 }

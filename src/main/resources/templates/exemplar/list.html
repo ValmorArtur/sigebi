@@ -50,7 +50,7 @@
           <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Título (Acervo)
           </th>
           <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Situação</th>
-          <th class="px-4 py-2 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Ações</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Ações</th>
         </tr>
       </thead>
 
@@ -74,7 +74,7 @@
             </span>
           </td>
           <td class="px-4 py-1 leading-tight">
-            <div class="flex justify-center items-center gap-1">
+            <div class="flex justify-left items-center gap-1">
               <!-- Botões padrão -->
               <div th:replace="~{fragments/botoes-acoes :: acoes(
                 '/exemplar/visualizar/' + ${e.idTombo}, 'Visualizar exemplar', false, true,
