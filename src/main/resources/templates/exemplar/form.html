@@ -47,7 +47,6 @@
     </div>
 
     <!-- Situação -->
-    <!-- Situação -->
     <div>
       <label class="block text-sm font-medium text-gray-700">
         Situação <span class="text-red-600">*</span>
@@ -56,18 +55,28 @@
       <select th:field="*{situacao}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
                  focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
 
-        <!-- Opções exceto EMPRESTADO -->
+        <!-- Opções exceto EMPRESTADO 
         <option th:each="s : ${situacoes}" th:if="${s.name() != 'EMPRESTADO'}" th:value="${s}" th:text="${s.label}">
+        </option>-->
+        <!-- Se NÃO estiver emprestado: mostra todas as opções, menos EMPRESTADO -->
+        <option th:each="s : ${situacoes}"
+          th:if="${exemplar.situacao == null or exemplar.situacao.name() != 'EMPRESTADO' and s.name() != 'EMPRESTADO'}"
+          th:value="${s}" th:text="${s.label}">
         </option>
 
-        <!-- Se já estiver EMPRESTADO, mostra como selecionado porém desabilitado -->
+        <!-- Se já estiver EMPRESTADO, mostra como selecionado porém desabilitado 
         <option th:if="${exemplar.situacao != null and exemplar.situacao.name() == 'EMPRESTADO'}"
           th:value="${exemplar.situacao}" th:text="${exemplar.situacao.label}" selected disabled>
+        </option>-->
+
+        <!-- Se JÁ estiver emprestado: mostra só EMPRESTADO -->
+        <option th:if="${exemplar.situacao != null and exemplar.situacao.name() == 'EMPRESTADO'}"
+          th:value="${exemplar.situacao}" th:text="${exemplar.situacao.label}" selected>
         </option>
       </select>
 
       <small class="text-gray-500">
-        Para emprestar, use o módulo <b>Empréstimos</b>.
+        Para emprestar ou devolver, use o módulo <b>Empréstimos</b>.
       </small>
 
       <div class="text-red-600 text-sm" th:if="${#fields.hasErrors('situacao')}" th:errors="*{situacao}"></div>
