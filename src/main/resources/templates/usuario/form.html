@@ -38,7 +38,7 @@
       <div class="grid grid-cols-2 gap-6">
         <div>
           <label class="block text-gray-700 font-semibold">Nome</label>
-          <input type="text" th:field="*{nomeUsuario}" th:disabled="${edicaoRestrita}"
+          <input type="text" th:field="*{nomeUsuario}" id="nomeUsuario" th:disabled="${edicaoRestrita}"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400"
             required>
           <div class="text-red-600 text-sm" th:if="${#fields.hasErrors('nomeUsuario')}" th:errors="*{nomeUsuario}">
@@ -312,6 +312,7 @@
       const msgEmailUsuario = document.getElementById("erroEmailUsuario");
 
       const cepInput = document.getElementById("cep");
+      const nomeUsuario = document.getElementById("nomeUsuario");
 
       // Só números no teclado
       cepInput.addEventListener("keydown", somenteDigitos);
@@ -339,6 +340,26 @@
       limparErro(cpfUsuario, msgCpfUsuario);
       limparErro(foneUsuario, msgFoneUsuario);
       limparErro(emailUsuario, msgEmailUsuario);
+
+      if (nomeUsuario) {
+        nomeUsuario.addEventListener("input", function () {
+          // Remove números conforme digita
+          this.value = this.value.replace(/\d/g, '');
+        });
+
+        nomeUsuario.addEventListener("blur", function () {
+          const temNumero = /\d/.test(this.value);
+          if (temNumero) {
+            this.classList.add("border-red-500");
+            this.setAttribute("aria-invalid", "true");
+            alert("O nome não pode conter números.");
+            setTimeout(() => { this.focus(); this.select(); }, 0);
+          } else {
+            this.classList.remove("border-red-500");
+            this.setAttribute("aria-invalid", "false");
+          }
+        });
+      }
 
       // Validação ao perder o foco (com foco de volta se inválido)
       cpfUsuario.addEventListener("blur", () => {
@@ -499,6 +520,19 @@
           }
           return false;
         }
+
+        const nomeUsuario = document.getElementById("nomeUsuario");
+        if (nomeUsuario) {
+          if (/\d/.test(nomeUsuario.value)) {
+            nomeUsuario.classList.add("border-red-500");
+            alert("O nome não pode conter números.");
+            erroLocal = true;
+            if (!primeiroInvalido) primeiroInvalido = nomeUsuario;
+          } else {
+            nomeUsuario.classList.remove("border-red-500");
+          }
+        }
+
       });
 
       document.getElementById('cep').addEventListener('blur', async function () {
