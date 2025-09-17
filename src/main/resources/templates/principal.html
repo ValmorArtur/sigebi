@@ -14,7 +14,7 @@
   <style>
     /* Evita pulo quando a barra de rolagem some/volta */
     html {
-      scrollbar-gutter: stable both-edges;
+      /*scrollbar-gutter: stable both-edges;*/
     }
 
     @supports not (scrollbar-gutter: stable) {
@@ -361,21 +361,21 @@
   </script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const flashes = document.querySelectorAll('[data-flash]');
-      flashes.forEach(el => {
-        const ms = parseInt(el.getAttribute('data-flash'), 10) || 3500; // padrão 3,5s
-        el.classList.add('transition-opacity', 'duration-700'); // Tailwind
-        // garante visível ao montar
-        el.style.opacity = 1;
-        // agenda o fade
-        setTimeout(() => {
-          el.style.opacity = 0;
-          // remove do DOM após a transição
-          setTimeout(() => el.remove(), 800);
-        }, ms);
-      });
-    });
+    //document.addEventListener('DOMContentLoaded', function () {
+    //  const flashes = document.querySelectorAll('[data-flash]');
+    //  flashes.forEach(el => {
+    //    const ms = parseInt(el.getAttribute('data-flash'), 10) || 2000; // padrão 3,5s
+    //    el.classList.add('transition-opacity', 'duration-700'); // Tailwind
+    //    // garante visível ao montar
+    //    el.style.opacity = 1;
+    //    // agenda o fade
+    //    setTimeout(() => {
+    //      el.style.opacity = 0;
+    //      // remove do DOM após a transição
+    //      setTimeout(() => el.remove(), 800);
+    //    }, ms);
+    //  });
+    //});
   </script>
   <!-- Overlay + Caixa Flutuante -->
   <div id="float-overlay"></div>
@@ -385,10 +385,10 @@
       <button id="fb-x" aria-label="Fechar" title="Fechar" style="margin-left:auto">✕</button>
     </div>
     <div class="fb-body" id="fb-message">Mensagem...</div>
-    <div class="fb-footer">
+    <!--<div class="fb-footer">
       <button class="fb-btn fb-close" id="fb-close">Fechar</button>
       <button class="fb-btn fb-ok" id="fb-ok">OK</button>
-    </div>
+    </div>-->
   </div>
 
   <script>
@@ -398,8 +398,8 @@
       const titleEl = document.getElementById('fb-title');
       const msgEl = document.getElementById('fb-message');
       const btnX = document.getElementById('fb-x');
-      const btnOk = document.getElementById('fb-ok');
-      const btnCl = document.getElementById('fb-close');
+      //const btnOk = document.getElementById('fb-ok');
+      //const btnCl = document.getElementById('fb-close');
 
       let hideTimer = null;
 
@@ -418,10 +418,10 @@
         box.classList.add('show');
 
         // foco acessível
-        btnOk.focus();
+        //btnOk.focus();
 
         // auto-fecha
-        hideTimer = setTimeout(closeFloat, ms || 3500);
+        hideTimer = setTimeout(closeFloat, ms || 2000);
       }
 
       function closeFloat() {
@@ -432,15 +432,15 @@
 
       // Eventos de fechar
       btnX.addEventListener('click', closeFloat);
-      btnCl.addEventListener('click', closeFloat);
-      btnOk.addEventListener('click', closeFloat);
+      //btnCl.addEventListener('click', closeFloat);
+      //btnOk.addEventListener('click', closeFloat);
       if (overlay) overlay.addEventListener('click', closeFloat);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFloat(); });
 
       // Converte placeholders [data-flash] em caixa flutuante
       document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-flash]').forEach(n => {
-          const ms = parseInt(n.getAttribute('data-flash'), 10) || 3500;
+          const ms = parseInt(n.getAttribute('data-flash'), 10) || 2000;
           const kind = (n.getAttribute('data-kind') || 'success').toLowerCase();
           const txt = n.textContent || '';
           n.remove();                  // não ocupa layout
