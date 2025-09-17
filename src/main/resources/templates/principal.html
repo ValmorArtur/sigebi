@@ -13,9 +13,9 @@
 
   <style>
     /* Evita pulo quando a barra de rolagem some/volta */
-    html {
-      /*scrollbar-gutter: stable both-edges;*/
-    }
+    /*html {
+      /*scrollbar-gutter: stable both-edges;
+    }*/
 
     @supports not (scrollbar-gutter: stable) {
       body {
@@ -44,11 +44,8 @@
       max-width: 640px;
       background: #fff;
       color: #1f2937;
-      /* gray-800 */
       border: 1px solid #e5e7eb;
-      /* gray-200 */
       border-radius: .75rem;
-      /* rounded-xl */
       box-shadow: 0 10px 25px rgba(0, 0, 0, .2);
       opacity: 0;
       pointer-events: none;
@@ -61,34 +58,57 @@
       pointer-events: auto;
     }
 
-    /* Cabeçalho + variações de tipo */
+    /* ====== Cabeçalho comum a todos os modais ====== */
     .fb-header {
       display: flex;
       align-items: center;
       gap: .5rem;
       padding: .75rem 1rem;
-      border-bottom: 1px solid #e5e7eb;
-      font-weight: 600
+      font-weight: 600;
+      background: rgb(33, 45, 59);/* azul escuro */
+      color: #ffffff;/* funco branco */
+      border-bottom: none;/* sem borda cinza */
+      border-top-left-radius: .75rem;/* arredondado igual ao box */
+      border-top-right-radius: .75rem;
+      position: relative; /* necessário para a faixa amarela */
     }
 
-    .fb-success .fb-header {
-      background: #ecfccb;
-      color: #3f6212;
+    /* Faixa amarela em todos os cabeçalhos */
+    .fb-header::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 4px;/* espessura */
+      background: #FACC15;/* amarelo Tailwind yellow-400 */
     }
 
-    /* lime-50/700 */
-    .fb-error .fb-header {
-      background: #fee2e2;
-      color: #991b1b;
+    /* Padronização das variantes (não mudam visual) */
+    .fb-success .fb-header,
+    .fb-error   .fb-header,
+    .fb-info    .fb-header {
+      background: rgb(33, 45, 59) !important;
+      color: #ffffff !important;
+    }
+    /* Garante que a faixa não ultrapasse o card */
+    #float-box,
+    #confirm-box {
+      border: none;                        /* remove a borda externa */
+      border-radius: .75rem;               /* mantém o raio arredondado */
+      overflow: hidden;                    /* garante recorte nos cantos */
     }
 
-    /* red-100/800 */
-    .fb-info .fb-header {
-      background: #e0f2fe;
-      color: #075985;
+    .fb-inner {
+      border: 1px solid #e5e7eb;           /* mesma cor que você usava */
+      border-top: none;                    /* sem borda onde fica o header */
+      border-bottom-left-radius: .75rem;   /* raio só embaixo */
+      border-bottom-right-radius: .75rem;
+      background: #fff;
     }
 
-    /* sky-100/800 */
+    /* (opcional, mas ajuda no acabamento do título com o quadradinho) */
+    #confirm-title { display:inline-block; line-height:1.25; padding-left:.125rem; }
 
     .fb-body {
       padding: .75rem 1rem;
@@ -99,6 +119,85 @@
       justify-content: flex-end;
       gap: .5rem;
       padding: .5rem 1rem 1rem
+    }
+
+        /* Linha do corpo com texto à esquerda e ícone à direita */
+    .fb-body-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:1rem;
+    }
+
+    /* Ícone genérico (base) */
+    .fb-mark{
+      --mark-size: 22px;                 /* tamanho padrão */
+      width: var(--mark-size);
+      height: var(--mark-size);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .fb-mark svg{
+      width: calc(var(--mark-size) * .64);
+      height: calc(var(--mark-size) * .64);
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Variações */
+    .fb-mark.is-success{
+      border-radius:9999px;          /* círculo */
+      background:#22C55E;            /* green-500 */
+    }
+    .fb-mark.is-success svg{ stroke:#fff; }
+
+    .fb-mark.is-attn{
+      border-radius:.375rem;         /* levemente arredondado (quadradinho) */
+      background:#FACC15;           /* yellow-400 */
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,.08);
+    }
+    .fb-mark.is-attn svg{ stroke:#1f2937; } /* gray-800 */
+
+    /* Tamanhos prontos (escolha um e aplique no HTML) */
+    .fb-mark.is-lg  { --mark-size: 36px; }
+    .fb-mark.is-xl  { --mark-size: 48px; }
+    .fb-mark.is-2xl { --mark-size: 64px; }    
+    .fb-mark.is-3xl { --mark-size: 80px; }    
+    .fb-mark.is-4xl { --mark-size: 96px; }
+    .fb-mark.is-5xl { --mark-size: 128px; }
+    .fb-mark.is-6xl { --mark-size: 160px; }
+    .fb-mark.is-7xl { --mark-size: 192px; }
+
+    /* ===== Tamanhos de fonte dos boxes ===== */
+    /* Valores padrão maiores para ambos (#float-box e #confirm-box) */
+    #float-box,
+    #confirm-box{
+      --fb-h-size: 1.25rem;   /* ~20px  cabeçalho */
+      --fb-b-size: 1.125rem;  /* ~18px  texto do corpo */
+      --fb-btn-size: 1.0625rem; /* ~17px botões */
+    }
+
+    /* Aplicação das variáveis */
+    .fb-header{ font-size: var(--fb-h-size); }
+    .fb-body{ font-size: var(--fb-b-size); line-height: 1.55; }
+    .fb-btn{  font-size: var(--fb-btn-size); }
+
+    /* (opcional) presets prontos se quiser variar por box */
+    .modal-lg  { --fb-h-size: 1.375rem; --fb-b-size: 1.25rem;  --fb-btn-size: 1.125rem; } /* ~22/20/18px */
+    .modal-xl  { --fb-h-size: 1.5rem;   --fb-b-size: 1.375rem; --fb-btn-size: 1.25rem; }  /* ~24/22/20px */
+
+    /* (opcional) ajusta para telas pequenas para não estourar */
+    @media (max-width: 480px){
+      #float-box,
+      #confirm-box{
+        --fb-h-size: 1.125rem;
+        --fb-b-size: 1rem;
+        --fb-btn-size: 1rem;
+      }
     }
 
     .fb-btn {
@@ -206,6 +305,36 @@
     /* tira margem à direita caso algum ícone tenha mr-* */
     #sidebar.collapsed #userMenuBtn img {
       margin-right: 0 !important;
+    }
+
+    #confirm-box {
+      position: fixed;
+      z-index: 10000;
+      top: 22%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      min-width: 320px;
+      max-width: 640px;
+      background: #fff;
+      color: #1f2937;
+      border: none;
+      border-radius: .75rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .2);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    #confirm-box.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+      display: block;
+    }
+
+    .fb-ok {
+      background: #2e3f52;
+      color: #fff;
     }
   </style>
 </head>
@@ -360,35 +489,54 @@
     });
   </script>
 
-  <script>
-    //document.addEventListener('DOMContentLoaded', function () {
-    //  const flashes = document.querySelectorAll('[data-flash]');
-    //  flashes.forEach(el => {
-    //    const ms = parseInt(el.getAttribute('data-flash'), 10) || 2000; // padrão 3,5s
-    //    el.classList.add('transition-opacity', 'duration-700'); // Tailwind
-    //    // garante visível ao montar
-    //    el.style.opacity = 1;
-    //    // agenda o fade
-    //    setTimeout(() => {
-    //      el.style.opacity = 0;
-    //      // remove do DOM após a transição
-    //      setTimeout(() => el.remove(), 800);
-    //    }, ms);
-    //  });
-    //});
-  </script>
   <!-- Overlay + Caixa Flutuante -->
   <div id="float-overlay"></div>
-  <div id="float-box" class="fb-success" role="status" aria-live="polite" aria-modal="true">
-    <div class="fb-header">
-      <span id="fb-title">Sucesso</span>
-      <button id="fb-x" aria-label="Fechar" title="Fechar" style="margin-left:auto">✕</button>
+    
+    <div id="float-box" class="fb-success modal-xl" role="status" aria-live="polite" aria-modal="true">
+      <div class="fb-header">
+        <span id="fb-title">Sucesso</span>
+        <button id="fb-x" aria-label="Fechar" title="Fechar" style="margin-left:auto">✕</button>
+      </div>
+    
+      <!-- NOVO: miolo com borda -->
+      <div class="fb-inner">
+        <div class="fb-body fb-body-row">
+          <div id="fb-message">Mensagem...</div>
+          <span class="fb-mark is-success is-4xl" aria-hidden="true">
+            <!-- ícone check -->
+            <svg viewBox="0 0 24 24">
+              <path d="M5 13l4 4L19 7"/>
+            </svg>
+          </span>
+        </div>
+      </div>
     </div>
-    <div class="fb-body" id="fb-message">Mensagem...</div>
-    <!--<div class="fb-footer">
-      <button class="fb-btn fb-close" id="fb-close">Fechar</button>
-      <button class="fb-btn fb-ok" id="fb-ok">OK</button>
-    </div>-->
+
+
+  <!-- Caixa de Confirmação -->
+  <div id="confirm-box" class="fb-info modal-xl" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="fb-header">
+      <span id="confirm-title">Confirmar ação</span>
+      <button id="confirm-x" aria-label="Fechar" title="Fechar" style="margin-left:auto">✕</button>
+    </div>
+
+    <!-- NOVO: miolo com borda -->
+    <div class="fb-inner">
+      <div class="fb-body fb-body-row">
+        <div id="confirm-message">Tem certeza?</div>
+        <span class="fb-mark is-attn is-4xl" aria-hidden="true">
+          <!-- ícone de atenção (triângulo/exclamação) -->
+          <svg viewBox="0 0 24 24">
+            <path d="M12 8v4m0 4h.01"/>
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          </svg>
+        </span>
+      </div>
+      <div class="fb-footer">
+        <button id="confirm-cancel" class="fb-btn fb-close">Cancelar</button>
+        <a id="confirm-ok" class="fb-btn fb-ok">Confirmar</a>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -398,8 +546,6 @@
       const titleEl = document.getElementById('fb-title');
       const msgEl = document.getElementById('fb-message');
       const btnX = document.getElementById('fb-x');
-      //const btnOk = document.getElementById('fb-ok');
-      //const btnCl = document.getElementById('fb-close');
 
       let hideTimer = null;
 
@@ -417,9 +563,6 @@
         if (overlay) overlay.style.display = 'block';
         box.classList.add('show');
 
-        // foco acessível
-        //btnOk.focus();
-
         // auto-fecha
         hideTimer = setTimeout(closeFloat, ms || 2000);
       }
@@ -432,8 +575,6 @@
 
       // Eventos de fechar
       btnX.addEventListener('click', closeFloat);
-      //btnCl.addEventListener('click', closeFloat);
-      //btnOk.addEventListener('click', closeFloat);
       if (overlay) overlay.addEventListener('click', closeFloat);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFloat(); });
 
@@ -450,6 +591,74 @@
 
       // Exponha para uso manual (se quiser chamar de outros pontos)
       window.showFloatBox = openFloat;
+    })();
+  </script>
+
+  <script>
+    (function () {
+      const overlay = document.getElementById('float-overlay'); // reaproveitado
+      const box = document.getElementById('confirm-box');
+      const titleEl = document.getElementById('confirm-title');
+      const msgEl = document.getElementById('confirm-message');
+      const btnX = document.getElementById('confirm-x');
+      const btnCancel = document.getElementById('confirm-cancel');
+      const btnOk = document.getElementById('confirm-ok');
+
+      let pendingHref = null;
+
+      function decorateTitle(t) {
+        const s = (t || 'Confirmar ação').trim();
+        return `<span class="relative inline-block">
+            <span class="absolute w-[18px] h-[18px] bg-yellow-400 rounded-sm -left-2 top-[2px] z-0"></span>
+            <span class="relative z-10">${s.charAt(0)}</span>${s.slice(1)}
+          </span>`;
+      }
+
+      function openConfirm(message, href, title = 'Confirmar ação') {
+        pendingHref = href;
+        // aplica sempre a decoração (quadradinho + primeira letra destacada)
+        titleEl.innerHTML = decorateTitle(title);
+        msgEl.textContent = message || 'Tem certeza?';
+
+        overlay.style.display = 'block';
+        requestAnimationFrame(() => box.classList.add('show'));
+      }
+
+
+      function closeConfirm() {
+        box.classList.remove('show');
+        overlay.style.display = 'none';
+        pendingHref = null;
+      }
+
+      // Ações dos botões
+      btnX.addEventListener('click', closeConfirm);
+      btnCancel.addEventListener('click', closeConfirm);
+      overlay.addEventListener('click', closeConfirm);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeConfirm(); });
+
+      btnOk.addEventListener('click', () => {
+        if (pendingHref) {
+          // segue o fluxo original: GET /excluir/{id} (mantém tudo que já existe)
+          window.location.href = pendingHref;
+        }
+        closeConfirm();
+      });
+
+      // Delegação: captura cliques em <a data-confirm="true">
+      document.addEventListener('click', (ev) => {
+        const tgt = ev.target.closest('a[data-confirm="true"]');
+        if (!tgt) return;
+
+        // impede navegação imediata para abrirmos o modal
+        ev.preventDefault();
+        const href = tgt.getAttribute('href');
+        const message = tgt.getAttribute('data-message') || 'Tem certeza que deseja excluir?';
+        openConfirm(message, href);
+      });
+
+      // Expor global (se precisar abrir manualmente de outros pontos)
+      window.openConfirm = openConfirm;
     })();
   </script>
 
