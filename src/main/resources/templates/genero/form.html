@@ -22,8 +22,12 @@
   <!-- Mensagens -->
   <div th:if="${erro}" class="text-red-600 font-semibold mb-4 text-center" th:text="${erro}"></div>
   <div th:if="${mensagem}"
-       class="bg-green-100 border border-green-400 text-green-800 text-sm font-semibold p-3 rounded mb-4 text-center"
-       th:text="${mensagem}"></div>
+    class="bg-green-100 border border-green-400 text-green-800 text-sm font-semibold p-3 rounded mb-4 text-center"
+    th:text="${mensagem}" role="status" aria-live="polite" data-flash="3500"></div>
+  <div th:if="${sucesso}"
+    class="bg-green-100 border border-green-400 text-green-800 text-sm font-semibold p-3 rounded mb-4 text-center"
+    th:text="${sucesso}" role="status" aria-live="polite" data-flash="3500"></div>
+
 
   <!-- Formulário -->
   <form id="formGenero" th:action="@{/genero/salvar}" method="post" th:object="${genero}" class="space-y-4">
@@ -35,8 +39,7 @@
       <!-- Descrição -->
       <div>
         <label class="block text-gray-700 font-semibold">Descrição</label>
-        <input th:field="*{descricao}" required maxlength="50"
-               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+        <input th:field="*{descricao}" required maxlength="50" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
                       focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
         <div class="flex justify-between">
           <small class="text-gray-500">Máx. 50 caracteres</small>
@@ -57,7 +60,8 @@
     <!-- Botões -->
     <div class="flex justify-end mt-8 space-x-2">
       <button type="reset" class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded">Limpar</button>
-      <a href="/genero" class="bg-gray-400 text-white px-5 py-2 rounded hover:bg-gray-500 inline-flex items-center justify-center">Cancelar</a>
+      <a href="/genero"
+        class="bg-gray-400 text-white px-5 py-2 rounded hover:bg-gray-500 inline-flex items-center justify-center">Cancelar</a>
       <button type="submit" class="bg-[#2e3f52] hover:bg-[#1f2d3a] text-white px-6 py-2 rounded">Salvar</button>
     </div>
   </form>

@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 
 <head>
@@ -252,6 +250,24 @@
         setSidebarCollapsed(!sidebar.classList.contains("collapsed"));
       });
 
+    });
+  </script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const flashes = document.querySelectorAll('[data-flash]');
+      flashes.forEach(el => {
+        const ms = parseInt(el.getAttribute('data-flash'), 10) || 3500; // padrão 3,5s
+        el.classList.add('transition-opacity', 'duration-700'); // Tailwind
+        // garante visível ao montar
+        el.style.opacity = 1;
+        // agenda o fade
+        setTimeout(() => {
+          el.style.opacity = 0;
+          // remove do DOM após a transição
+          setTimeout(() => el.remove(), 800);
+        }, ms);
+      });
     });
   </script>
 

@@ -37,10 +37,13 @@
   <!-- Linha separadora -->
   <div class="h-1 bg-yellow-400 mb-4 rounded-sm"></div>
 
-  <!-- Mensagem flash -->
-  <div th:if="${mensagem}"
-    class="bg-green-100 border border-green-400 text-green-800 text-sm font-semibold p-3 rounded mb-4 text-center"
-    th:text="${mensagem}"></div>
+  <!-- Mensagem flash Alerts (auto-dismiss) -->
+  <div th:if="${mensagem}" class="mt-2 p-3 rounded border border-green-300 bg-green-100 text-green-800"
+    th:text="${mensagem}" role="status" aria-live="polite" data-flash="3500"></div>
+  <div th:if="${sucesso}" class="mt-2 p-3 rounded border border-green-300 bg-green-100 text-green-800"
+    th:text="${sucesso}" role="status" aria-live="polite" data-flash="3500"></div>
+  <div th:if="${erro}" class="mt-2 p-3 rounded border border-red-300 bg-red-100 text-red-800" th:text="${erro}"
+    role="alert" aria-live="assertive" data-flash="5000"></div>
 
   <!-- Tabela -->
   <div class="overflow-x-auto mt-4">
@@ -81,7 +84,7 @@
               @{/acervo/excluir/{id}(id=${it.idAcervo})}, 'Excluir Acervo', true,
               @{/acervo/ativar/{id}(id=${it.idAcervo})}, ${it.ativo}, true )}">
             </div><!-- Primeiro parâmetro true ou false: se vai ou não mostrar o botão-->
-                  <!-- Segundo parâmetro true ou false se apenas admin vai ver (apenasAdminVisualizar) -->
+            <!-- Segundo parâmetro true ou false se apenas admin vai ver (apenasAdminVisualizar) -->
           </td>
         </tr>
         <tr th:if="${#lists.isEmpty(lista)}">

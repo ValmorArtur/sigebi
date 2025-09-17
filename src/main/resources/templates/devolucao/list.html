@@ -29,6 +29,15 @@
 
     <div class="h-1 bg-yellow-400 mb-4 mt-2 rounded-sm"></div>
 
+    <!-- Alerts (auto-dismiss) -->
+    <div th:if="${mensagem}" class="mt-2 p-3 rounded border border-green-300 bg-green-100 text-green-800"
+        th:text="${mensagem}" role="status" aria-live="polite" data-flash="3500"></div>
+    <div th:if="${sucesso}" class="mt-2 p-3 rounded border border-green-300 bg-green-100 text-green-800"
+        th:text="${sucesso}" role="status" aria-live="polite" data-flash="3500"></div>
+    <div th:if="${erro}" class="mt-2 p-3 rounded border border-red-300 bg-red-100 text-red-800" th:text="${erro}"
+        role="alert" aria-live="assertive" data-flash="5000"></div>
+
+
     <!-- Tabela -->
     <div class="overflow-x-auto mt-4">
         <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
@@ -53,13 +62,17 @@
                     <td class="px-4 py-2" th:text="${it.usuario != null ? it.usuario.loginUsuario : '-'}">—</td>
                     <td class="px-4 py-2" th:text="${it.exemplar != null ? it.exemplar.idTombo : '-'}">—</td>
                     <td class="px-4 py-2"
-                        th:text="${(it.exemplar != null && it.exemplar.acervo != null) ? it.exemplar.acervo.tituloAcervo : '-'}">—</td>
+                        th:text="${(it.exemplar != null && it.exemplar.acervo != null) ? it.exemplar.acervo.tituloAcervo : '-'}">
+                        —</td>
                     <td class="px-4 py-2"
-                        th:text="${it.dataEmprestimo != null ? #temporals.format(it.dataEmprestimo, 'dd/MM/yyyy') : '-'}">—</td>
+                        th:text="${it.dataEmprestimo != null ? #temporals.format(it.dataEmprestimo, 'dd/MM/yyyy') : '-'}">
+                        —</td>
                     <td class="px-4 py-2"
-                        th:text="${it.dataPrevistaDevolucao != null ? #temporals.format(it.dataPrevistaDevolucao, 'dd/MM/yyyy') : '-'}">—</td>
+                        th:text="${it.dataPrevistaDevolucao != null ? #temporals.format(it.dataPrevistaDevolucao, 'dd/MM/yyyy') : '-'}">
+                        —</td>
                     <td class="px-4 py-2"
-                        th:text="${it.dataDevolucao != null ? #temporals.format(it.dataDevolucao, 'dd/MM/yyyy') : '-'}">—</td>
+                        th:text="${it.dataDevolucao != null ? #temporals.format(it.dataDevolucao, 'dd/MM/yyyy') : '-'}">
+                        —</td>
                     <td class="px-4 py-2">
                         <span
                             th:if="${it.dataDevolucao != null and it.dataPrevistaDevolucao != null and it.dataDevolucao.isAfter(it.dataPrevistaDevolucao)}"
