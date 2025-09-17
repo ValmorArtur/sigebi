@@ -12,6 +12,113 @@
   <script defer th:src="@{/webjars/tom-select/dist/js/tom-select.complete.min.js}"></script>
 
   <style>
+    /* Evita pulo quando a barra de rolagem some/volta */
+    html {
+      scrollbar-gutter: stable both-edges;
+    }
+
+    @supports not (scrollbar-gutter: stable) {
+      body {
+        overflow-y: scroll;
+      }
+    }
+
+    /* Fundo escurecido (clique fecha) */
+    #float-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      background: rgba(0, 0, 0, .25);
+      display: none;
+      /* controlado via JS */
+    }
+
+    /* Caixa flutuante */
+    #float-box {
+      position: fixed;
+      z-index: 9999;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      min-width: 320px;
+      max-width: 640px;
+      background: #fff;
+      color: #1f2937;
+      /* gray-800 */
+      border: 1px solid #e5e7eb;
+      /* gray-200 */
+      border-radius: .75rem;
+      /* rounded-xl */
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .2);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    #float-box.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Cabeçalho + variações de tipo */
+    .fb-header {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .75rem 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      font-weight: 600
+    }
+
+    .fb-success .fb-header {
+      background: #ecfccb;
+      color: #3f6212;
+    }
+
+    /* lime-50/700 */
+    .fb-error .fb-header {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* red-100/800 */
+    .fb-info .fb-header {
+      background: #e0f2fe;
+      color: #075985;
+    }
+
+    /* sky-100/800 */
+
+    .fb-body {
+      padding: .75rem 1rem;
+    }
+
+    .fb-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: .5rem;
+      padding: .5rem 1rem 1rem
+    }
+
+    .fb-btn {
+      padding: .375rem .75rem;
+      border-radius: .5rem;
+      font-weight: 600
+    }
+
+    .fb-close {
+      background: #e5e7eb;
+    }
+
+    /* gray-200 */
+    .fb-ok {
+      background: #2e3f52;
+      color: #fff
+    }
+
+    /* seu azul */
+
     /* Largura do aside quando colapsado */
     #sidebar.collapsed {
       width: 4rem !important;
@@ -252,7 +359,7 @@
 
     });
   </script>
-  
+
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const flashes = document.querySelectorAll('[data-flash]');
@@ -269,6 +376,81 @@
         }, ms);
       });
     });
+  </script>
+  <!-- Overlay + Caixa Flutuante -->
+  <div id="float-overlay"></div>
+  <div id="float-box" class="fb-success" role="status" aria-live="polite" aria-modal="true">
+    <div class="fb-header">
+      <span id="fb-title">Sucesso</span>
+      <button id="fb-x" aria-label="Fechar" title="Fechar" style="margin-left:auto">✕</button>
+    </div>
+    <div class="fb-body" id="fb-message">Mensagem...</div>
+    <div class="fb-footer">
+      <button class="fb-btn fb-close" id="fb-close">Fechar</button>
+      <button class="fb-btn fb-ok" id="fb-ok">OK</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const overlay = document.getElementById('float-overlay');
+      const box = document.getElementById('float-box');
+      const titleEl = document.getElementById('fb-title');
+      const msgEl = document.getElementById('fb-message');
+      const btnX = document.getElementById('fb-x');
+      const btnOk = document.getElementById('fb-ok');
+      const btnCl = document.getElementById('fb-close');
+
+      let hideTimer = null;
+
+      function setKind(kind) {
+        box.classList.remove('fb-success', 'fb-error', 'fb-info');
+        if (kind === 'error') { box.classList.add('fb-error'); box.setAttribute('role', 'alert'); box.setAttribute('aria-live', 'assertive'); titleEl.textContent = 'Erro'; }
+        else if (kind === 'info') { box.classList.add('fb-info'); box.setAttribute('role', 'status'); box.setAttribute('aria-live', 'polite'); titleEl.textContent = 'Informação'; }
+        else { box.classList.add('fb-success'); box.setAttribute('role', 'status'); box.setAttribute('aria-live', 'polite'); titleEl.textContent = 'Sucesso'; }
+      }
+
+      function openFloat(kind, text, ms) {
+        clearTimeout(hideTimer);
+        setKind(kind);
+        msgEl.textContent = (text || '').trim();
+        if (overlay) overlay.style.display = 'block';
+        box.classList.add('show');
+
+        // foco acessível
+        btnOk.focus();
+
+        // auto-fecha
+        hideTimer = setTimeout(closeFloat, ms || 3500);
+      }
+
+      function closeFloat() {
+        clearTimeout(hideTimer);
+        box.classList.remove('show');
+        if (overlay) overlay.style.display = 'none';
+      }
+
+      // Eventos de fechar
+      btnX.addEventListener('click', closeFloat);
+      btnCl.addEventListener('click', closeFloat);
+      btnOk.addEventListener('click', closeFloat);
+      if (overlay) overlay.addEventListener('click', closeFloat);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFloat(); });
+
+      // Converte placeholders [data-flash] em caixa flutuante
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-flash]').forEach(n => {
+          const ms = parseInt(n.getAttribute('data-flash'), 10) || 3500;
+          const kind = (n.getAttribute('data-kind') || 'success').toLowerCase();
+          const txt = n.textContent || '';
+          n.remove();                  // não ocupa layout
+          openFloat(kind, txt, ms);    // mostra caixa
+        });
+      });
+
+      // Exponha para uso manual (se quiser chamar de outros pontos)
+      window.showFloatBox = openFloat;
+    })();
   </script>
 
 </body>

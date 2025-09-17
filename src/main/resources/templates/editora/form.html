@@ -18,14 +18,9 @@
   <div class="h-1 bg-yellow-400 mb-4 mt-14 rounded-sm"></div>
 
   <!-- Mensagens -->
-  <div th:if="${erro}" class="text-red-600 font-semibold mb-4 text-center" th:text="${erro}"></div>
-  <div th:if="${mensagem}"
-    class="bg-green-100 border border-green-400 text-green-800 text-sm font-semibold p-3 rounded mb-4 text-center"
-    th:text="${mensagem}" role="status" aria-live="polite" data-flash="3500"></div>
-  <div th:if="${sucesso}"
-    class="bg-green-100 border border-green-400 text-green-800 text-sm font-semibold p-3 rounded mb-4 text-center"
-    th:text="${sucesso}" role="status" aria-live="polite" data-flash="3500"></div>
-
+  <div th:if="${mensagem}" class="hidden" data-flash="3500" data-kind="success" th:text="${mensagem}"></div>
+  <div th:if="${sucesso}" class="hidden" data-flash="3500" data-kind="success" th:text="${sucesso}"></div>
+  <div th:if="${erro}" class="hidden" data-flash="5000" data-kind="error" th:text="${erro}"></div>
 
   <!-- Formulário -->
   <form id="formEditora" th:action="@{/editora/salvar}" method="post" th:object="${editora}" class="space-y-4">

@@ -37,34 +37,10 @@
   <!-- Faixa amarela abaixo do cabeçalho -->
   <div class="h-1 bg-yellow-400 mb-4 rounded-sm"></div>
 
-  <!-- Alerts 
-  <div th:if="${sucesso}" 
-       class="mt-2 p-3 rounded bg-green-100 text-green-800" 
-       th:text="${sucesso}"></div>
-  <div th:if="${erro}" 
-       class="mt-2 p-3 rounded bg-red-100 text-red-800" 
-       th:text="${erro}"></div>-->
-
-  <!-- Alerts (auto-dismiss) 
-<div th:if="${sucesso}"
-     class="mt-2 p-3 rounded border border-green-300 bg-green-100 text-green-800"
-     th:text="${sucesso}"
-     role="status" aria-live="polite"
-     data-flash="3500"></div>
-
-<div th:if="${erro}"
-     class="mt-2 p-3 rounded border border-red-300 bg-red-100 text-red-800"
-     th:text="${erro}"
-     role="alert" aria-live="assertive"
-     data-flash="5000"></div>-->
-
   <!-- Alerts (auto-dismiss) -->
-  <div th:if="${mensagem}" class="mt-2 p-3 rounded border border-green-300 bg-green-100 text-green-800"
-    th:text="${mensagem}" role="status" aria-live="polite" data-flash="3500"></div>
-  <div th:if="${sucesso}" class="mt-2 p-3 rounded border border-green-300 bg-green-100 text-green-800"
-    th:text="${sucesso}" role="status" aria-live="polite" data-flash="3500"></div>
-  <div th:if="${erro}" class="mt-2 p-3 rounded border border-red-300 bg-red-100 text-red-800" th:text="${erro}"
-    role="alert" aria-live="assertive" data-flash="5000"></div>
+  <div th:if="${mensagem}" class="hidden" data-flash="3500" data-kind="success" th:text="${mensagem}"></div>
+  <div th:if="${sucesso}" class="hidden" data-flash="3500" data-kind="success" th:text="${sucesso}"></div>
+  <div th:if="${erro}" class="hidden" data-flash="5000" data-kind="error" th:text="${erro}"></div>
 
   <!-- Tabela (bordas, cabeçalho cinza, zebrado) -->
   <div class="overflow-x-auto mt-4">
