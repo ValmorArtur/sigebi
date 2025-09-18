@@ -99,10 +99,22 @@ public class EmprestimoService {
             throw new IllegalStateException("Este empréstimo ainda não foi devolvido.");
         }
 
-        // desfaz devolução
+        // ⚠️ Regra: só reabrir se NÃO houver outro empréstimo ATIVO do mesmo tombo
+        String idTombo = e.getExemplar().getIdTombo();
+
+        emprestimoRepo.findFirstByExemplar_IdTomboAndDataDevolucaoIsNull(idTombo)
+                .filter(ativo -> !ativo.getIdEmprestimo().equals(e.getIdEmprestimo()))
+                .ifPresent(ativo -> {
+                    throw new IllegalStateException(
+                            "Não é possível remover a devolução do empréstimo #" + idEmprestimo +
+                                    " porque já existe empréstimo ativo (#" + ativo.getIdEmprestimo() +
+                                    ") para o tombo " + idTombo + ". Devolva/encerre o empréstimo ativo antes.");
+                });
+
+        // Desfaz a devolução (reabre este empréstimo)
         e.setDataDevolucao(null);
 
-        // volta o exemplar para EMPRESTADO e persiste ambas as entidades
+        // Ajusta situação do exemplar para EMPRESTADO
         Exemplar ex = e.getExemplar();
         if (ex != null) {
             ex.setSituacao(SituacaoExemplar.EMPRESTADO);
@@ -112,7 +124,7 @@ public class EmprestimoService {
         emprestimoRepo.save(e);
     }
 
-    // [NOVO] Renova um empréstimo ativo: encerra o atual e abre um novo para o
+    // Renova um empréstimo ativo: encerra o atual e abre um novo para o
     // mesmo exemplar/usuário
     @Transactional
     public Emprestimo renovar(Integer idEmprestimo, LocalDate novaPrevista, String observacao) {
