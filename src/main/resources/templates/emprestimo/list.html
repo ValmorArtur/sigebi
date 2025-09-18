@@ -84,7 +84,9 @@
 
               <!-- DEVOLVER (POST; só enquanto ativo) -->
               <form th:if="${it.dataDevolucao == null}" th:action="@{'/emprestimo/' + ${it.idEmprestimo} + '/devolver'}"
-                method="post" class="inline" onsubmit="return confirm('Confirmar devolução deste empréstimo?');">
+                method="post" class="inline" 
+                data-confirm="true" 
+                data-message="Confirmar devolução deste empréstimo?">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                 <input type="hidden" name="back" th:value="${urlBack}">
                 <button type="submit" class="text-white rounded-full flex items-center justify-center shadow-lg

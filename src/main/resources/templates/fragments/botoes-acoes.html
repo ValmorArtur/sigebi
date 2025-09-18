@@ -45,7 +45,8 @@
     <!-- Ativar/Inativar (somente ADMIN) -->
     <div th:if="${mostrarAtivar}" sec:authorize="hasRole('ADMIN')">
       <a th:href="${rotaAtivar}" th:title="${ativo} ? 'Inativar' : 'Ativar'"
-        onclick="return confirm('Tem certeza que deseja alterar o status?')"
+        data-confirm="true"
+        data-message="Tem certeza que deseja alterar o status?"
         class="bg-blue-500 hover:bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center transition duration-200 ease-in-out transform hover:scale-110">
 
         <!-- Ícone: ativo → X -->

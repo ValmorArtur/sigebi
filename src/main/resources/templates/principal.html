@@ -12,10 +12,6 @@
   <script defer th:src="@{/webjars/tom-select/dist/js/tom-select.complete.min.js}"></script>
 
   <style>
-    /* Evita pulo quando a barra de rolagem some/volta */
-    /*html {
-      /*scrollbar-gutter: stable both-edges;
-    }*/
 
     @supports not (scrollbar-gutter: stable) {
       body {
@@ -29,8 +25,7 @@
       inset: 0;
       z-index: 9998;
       background: rgba(0, 0, 0, .25);
-      display: none;
-      /* controlado via JS */
+      display: none;      /* controlado via JS */
     }
 
     /* Caixa flutuante */
@@ -65,12 +60,12 @@
       gap: .5rem;
       padding: .75rem 1rem;
       font-weight: 600;
-      background: rgb(33, 45, 59);/* azul escuro */
-      color: #ffffff;/* funco branco */
-      border-bottom: none;/* sem borda cinza */
-      border-top-left-radius: .75rem;/* arredondado igual ao box */
+      background: rgb(33, 45, 59);      /* azul escuro */
+      color: #ffffff;      /* funco branco */
+      border-bottom: none;      /* sem borda cinza */
+      border-top-left-radius: .75rem;      /* arredondado igual ao box */
       border-top-right-radius: .75rem;
-      position: relative; /* necessário para a faixa amarela */
+      position: relative;      /* necessário para a faixa amarela */
     }
 
     /* Faixa amarela em todos os cabeçalhos */
@@ -80,35 +75,40 @@
       left: 0;
       right: 0;
       bottom: 0;
-      height: 4px;/* espessura */
-      background: #FACC15;/* amarelo Tailwind yellow-400 */
+      height: 4px;      /* espessura */
+      background: #FACC15;      /* amarelo Tailwind yellow-400 */
     }
 
     /* Padronização das variantes (não mudam visual) */
     .fb-success .fb-header,
-    .fb-error   .fb-header,
-    .fb-info    .fb-header {
+    .fb-error .fb-header,
+    .fb-info .fb-header {
       background: rgb(33, 45, 59) !important;
       color: #ffffff !important;
     }
+
     /* Garante que a faixa não ultrapasse o card */
     #float-box,
     #confirm-box {
-      border: none;                        /* remove a borda externa */
-      border-radius: .75rem;               /* mantém o raio arredondado */
-      overflow: hidden;                    /* garante recorte nos cantos */
+      border: none;      /* remove a borda externa */
+      border-radius: .75rem;      /* mantém o raio arredondado */
+      overflow: hidden;      /* garante recorte nos cantos */
     }
 
     .fb-inner {
-      border: 1px solid #e5e7eb;           /* mesma cor que você usava */
-      border-top: none;                    /* sem borda onde fica o header */
-      border-bottom-left-radius: .75rem;   /* raio só embaixo */
+      border: 1px solid #e5e7eb;      /* mesma cor que você usava */
+      border-top: none;      /* sem borda onde fica o header */
+      border-bottom-left-radius: .75rem;      /* raio só embaixo */
       border-bottom-right-radius: .75rem;
       background: #fff;
     }
 
     /* (opcional, mas ajuda no acabamento do título com o quadradinho) */
-    #confirm-title { display:inline-block; line-height:1.25; padding-left:.125rem; }
+    #confirm-title {
+      display: inline-block;
+      line-height: 1.25;
+      padding-left: .125rem;
+    }
 
     .fb-body {
       padding: .75rem 1rem;
@@ -116,30 +116,38 @@
 
     .fb-footer {
       display: flex;
-      justify-content: flex-end;
+      justify-content: center;
       gap: .5rem;
       padding: .5rem 1rem 1rem
     }
 
-        /* Linha do corpo com texto à esquerda e ícone à direita */
-    .fb-body-row{
+    /* Ações do float-box (igual layout do footer de confirmação) */
+    .fb-actions{
       display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:1rem;
+      justify-content: center;
+      gap:.5rem;
+      padding:.5rem 1rem 1rem;
+    }
+
+    /* Linha do corpo com texto à esquerda e ícone à direita */
+    .fb-body-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
     }
 
     /* Ícone genérico (base) */
-    .fb-mark{
-      --mark-size: 22px;                 /* tamanho padrão */
+    .fb-mark {
+      --mark-size: 22px;      /* tamanho padrão */
       width: var(--mark-size);
       height: var(--mark-size);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .fb-mark svg{
+    .fb-mark svg {
       width: calc(var(--mark-size) * .64);
       height: calc(var(--mark-size) * .64);
       stroke-width: 2;
@@ -149,51 +157,91 @@
     }
 
     /* Variações */
-    .fb-mark.is-success{
-      border-radius:9999px;          /* círculo */
-      background:#22C55E;            /* green-500 */
+    .fb-mark.is-success {
+      border-radius: 9999px;      /* círculo */
+      background: #22C55E;      /* green-500 */
     }
-    .fb-mark.is-success svg{ stroke:#fff; }
 
-    .fb-mark.is-attn{
-      border-radius:.375rem;         /* levemente arredondado (quadradinho) */
-      background:#FACC15;           /* yellow-400 */
-      box-shadow: inset 0 0 0 2px rgba(0,0,0,.08);
+    .fb-mark.is-success svg {
+      stroke: #fff;
     }
-    .fb-mark.is-attn svg{ stroke:#1f2937; } /* gray-800 */
+
+    .fb-mark.is-attn {
+      border-radius: .375rem;      /* levemente arredondado (quadradinho) */
+      background: #FACC15;      /* yellow-400 */
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .08);
+    }
+
+    .fb-mark.is-attn svg {
+      stroke: #1f2937;
+    }
+
+    /* gray-800 */
+
+    /* Erro (círculo vermelho com “X”), mesmo tamanho dos demais */
+    .fb-mark.is-error {
+      border-radius: 9999px; /* círculo */
+      background: #EF4444;/* red-500 */
+    }
+
+    .fb-mark.is-error svg {
+      stroke: #fff;
+    }
 
     /* Tamanhos prontos (escolha um e aplique no HTML) */
-    .fb-mark.is-lg  { --mark-size: 36px; }
-    .fb-mark.is-xl  { --mark-size: 48px; }
-    .fb-mark.is-2xl { --mark-size: 64px; }    
-    .fb-mark.is-3xl { --mark-size: 80px; }    
-    .fb-mark.is-4xl { --mark-size: 96px; }
-    .fb-mark.is-5xl { --mark-size: 128px; }
-    .fb-mark.is-6xl { --mark-size: 160px; }
-    .fb-mark.is-7xl { --mark-size: 192px; }
+    .fb-mark.is-lg {--mark-size: 36px;}
+    .fb-mark.is-xl {--mark-size: 48px;}
+    .fb-mark.is-2xl {--mark-size: 64px;}
+    .fb-mark.is-3xl {--mark-size: 80px;}
+    .fb-mark.is-4xl {--mark-size: 96px;}
+    .fb-mark.is-5xl {--mark-size: 128px;}
+    .fb-mark.is-6xl {--mark-size: 160px;}
+    .fb-mark.is-7xl {--mark-size: 192px;}
 
     /* ===== Tamanhos de fonte dos boxes ===== */
     /* Valores padrão maiores para ambos (#float-box e #confirm-box) */
     #float-box,
-    #confirm-box{
-      --fb-h-size: 1.25rem;   /* ~20px  cabeçalho */
-      --fb-b-size: 1.125rem;  /* ~18px  texto do corpo */
-      --fb-btn-size: 1.0625rem; /* ~17px botões */
+    #confirm-box {
+      --fb-h-size: 1.25rem;      /* ~20px  cabeçalho */
+      --fb-b-size: 1.125rem;      /* ~18px  texto do corpo */
+      --fb-btn-size: 1.0625rem;      /* ~17px botões */
     }
 
     /* Aplicação das variáveis */
-    .fb-header{ font-size: var(--fb-h-size); }
-    .fb-body{ font-size: var(--fb-b-size); line-height: 1.55; }
-    .fb-btn{  font-size: var(--fb-btn-size); }
+    .fb-header {
+      font-size: var(--fb-h-size);
+    }
+
+    .fb-body {
+      font-size: var(--fb-b-size);
+      line-height: 1.55;
+    }
+
+    .fb-btn {
+      font-size: var(--fb-btn-size);
+    }
 
     /* (opcional) presets prontos se quiser variar por box */
-    .modal-lg  { --fb-h-size: 1.375rem; --fb-b-size: 1.25rem;  --fb-btn-size: 1.125rem; } /* ~22/20/18px */
-    .modal-xl  { --fb-h-size: 1.5rem;   --fb-b-size: 1.375rem; --fb-btn-size: 1.25rem; }  /* ~24/22/20px */
+    .modal-lg {
+      --fb-h-size: 1.375rem;
+      --fb-b-size: 1.25rem;
+      --fb-btn-size: 1.125rem;
+    }
+
+    /* ~22/20/18px */
+    .modal-xl {
+      --fb-h-size: 1.5rem;
+      --fb-b-size: 1.375rem;
+      --fb-btn-size: 1.25rem;
+    }
+
+    /* ~24/22/20px */
 
     /* (opcional) ajusta para telas pequenas para não estourar */
-    @media (max-width: 480px){
+    @media (max-width: 480px) {
+
       #float-box,
-      #confirm-box{
+      #confirm-box {
         --fb-h-size: 1.125rem;
         --fb-b-size: 1rem;
         --fb-btn-size: 1rem;
@@ -491,26 +539,28 @@
 
   <!-- Overlay + Caixa Flutuante -->
   <div id="float-overlay"></div>
-    
-    <div id="float-box" class="fb-success modal-xl" role="status" aria-live="polite" aria-modal="true">
-      <div class="fb-header">
-        <span id="fb-title">Sucesso</span>
-        <button id="fb-x" aria-label="Fechar" title="Fechar" style="margin-left:auto">✕</button>
-      </div>
-    
-      <!-- NOVO: miolo com borda -->
-      <div class="fb-inner">
-        <div class="fb-body fb-body-row">
-          <div id="fb-message">Mensagem...</div>
-          <span class="fb-mark is-success is-4xl" aria-hidden="true">
-            <!-- ícone check -->
-            <svg viewBox="0 0 24 24">
-              <path d="M5 13l4 4L19 7"/>
-            </svg>
-          </span>
-        </div>
-      </div>
+
+  <div id="float-box" class="fb-success modal-xl" role="status" aria-live="polite" aria-modal="true">
+    <div class="fb-header">
+      <span id="fb-title">Sucesso</span>
+      <button id="fb-x" aria-label="Fechar" title="Fechar" style="margin-left:auto">✕</button>
     </div>
+
+    <!-- NOVO: miolo com borda -->
+    <div class="fb-inner">
+      <div class="fb-body fb-body-row">
+        <div id="fb-message">Mensagem...</div>
+        <span class="fb-mark is-success is-4xl" aria-hidden="true">
+          <!-- ícone check -->
+          <svg viewBox="0 0 24 24">
+            <path d="M5 13l4 4L19 7" />
+          </svg>
+        </span>
+      </div>
+      
+      <div id="fb-actions" class="fb-actions hidden"></div>
+    </div>
+  </div>
 
 
   <!-- Caixa de Confirmação -->
@@ -527,8 +577,8 @@
         <span class="fb-mark is-attn is-4xl" aria-hidden="true">
           <!-- ícone de atenção (triângulo/exclamação) -->
           <svg viewBox="0 0 24 24">
-            <path d="M12 8v4m0 4h.01"/>
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <path d="M12 8v4m0 4h.01" />
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
           </svg>
         </span>
       </div>
@@ -546,26 +596,102 @@
       const titleEl = document.getElementById('fb-title');
       const msgEl = document.getElementById('fb-message');
       const btnX = document.getElementById('fb-x');
+      const actionsEl = document.getElementById('fb-actions');
+      let hideTimer = null; // (você já tem) – mantemos
 
-      let hideTimer = null;
-
-      function setKind(kind) {
-        box.classList.remove('fb-success', 'fb-error', 'fb-info');
-        if (kind === 'error') { box.classList.add('fb-error'); box.setAttribute('role', 'alert'); box.setAttribute('aria-live', 'assertive'); titleEl.textContent = 'Erro'; }
-        else if (kind === 'info') { box.classList.add('fb-info'); box.setAttribute('role', 'status'); box.setAttribute('aria-live', 'polite'); titleEl.textContent = 'Informação'; }
-        else { box.classList.add('fb-success'); box.setAttribute('role', 'status'); box.setAttribute('aria-live', 'polite'); titleEl.textContent = 'Sucesso'; }
+      function clearActions(){
+        if(!actionsEl) return;
+        actionsEl.innerHTML = '';
+        actionsEl.classList.add('hidden');
       }
 
-      function openFloat(kind, text, ms) {
+      function addOkButton(label='OK'){
+        if(!actionsEl) return;
+        actionsEl.innerHTML = `<button id="fb-ok" type="button" class="fb-btn fb-ok">${label}</button>`;
+        actionsEl.classList.remove('hidden');
+        const ok = document.getElementById('fb-ok');
+        ok?.addEventListener('click', () => closeFloat());
+        // dar foco após a animação abrir
+        setTimeout(() => ok?.focus(), 50);
+      }
+
+      function decorateTitle(t) {
+        const s = (t || '').trim();
+        return `<span class="relative inline-block">
+                  <span class="absolute w-[18px] h-[18px] bg-yellow-400 rounded-sm -left-2 top-[-4px] z-0"></span>
+                  <span class="relative z-10">${s.charAt(0)}</span>${s.slice(1)}
+                </span>`;
+      }
+
+      function setKind(kind) {
+        box.classList.remove('fb-success','fb-error','fb-info');
+            
+        // preserva a classe de tamanho (ex.: is-4xl)
+        const mark = box.querySelector('.fb-mark');
+        const sizeClass = [...mark.classList].find(c => /is-\d?xl/.test(c)) || 'is-4xl';
+        mark.className = `fb-mark ${sizeClass}`;  // limpa variantes e mantém o tamanho
+            
+        if (kind === 'error') {
+          box.classList.add('fb-error');
+          box.setAttribute('role','alert');
+          box.setAttribute('aria-live','assertive');
+          titleEl.innerHTML = decorateTitle('Erro');
+        
+          mark.classList.add('is-error');
+          // Ícone “X” dentro do círculo
+          mark.innerHTML = `<svg viewBox="0 0 24 24">
+                              <path d="M6 6l12 12M18 6L6 18"/>
+                            </svg>`;
+        } else if (kind === 'info') {
+          box.classList.add('fb-info');
+          box.setAttribute('role','status');
+          box.setAttribute('aria-live','polite');
+          titleEl.innerHTML = decorateTitle('Informação');
+        
+          mark.classList.add('is-attn');
+          // Triângulo/exclamação (igual ao confirmar)
+          mark.innerHTML = `<svg viewBox="0 0 24 24">
+                              <path d="M12 8v4m0 4h.01"/>
+                              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            </svg>`;
+        } else {
+          box.classList.add('fb-success');
+          box.setAttribute('role','status');
+          box.setAttribute('aria-live','polite');
+          titleEl.innerHTML = decorateTitle('Sucesso');
+        
+          mark.classList.add('is-success');
+          // Check verde
+          mark.innerHTML = `<svg viewBox="0 0 24 24">
+                              <path d="M5 13l4 4L19 7"/>
+                            </svg>`;
+        }
+      }
+
+      function openFloat(kind, text, ms){
         clearTimeout(hideTimer);
+        clearActions();
+
         setKind(kind);
         msgEl.textContent = (text || '').trim();
+
+        // Tornar ERRO "sticky" com botão OK (independe do ms passado)
+        const isError = (kind === 'error');
+        const isSticky = isError || String(ms).toLowerCase() === 'sticky';
+
         if (overlay) overlay.style.display = 'block';
         box.classList.add('show');
 
-        // auto-fecha
-        hideTimer = setTimeout(closeFloat, ms || 2000);
+        if (isSticky) {
+          addOkButton('OK');    // mostra botão OK
+          return;               // não agenda auto-fechamento
+        }
+      
+        // auto-fecha para success/info
+        const dur = parseInt(ms, 10) || 2000;
+        hideTimer = setTimeout(closeFloat, dur);
       }
+
 
       function closeFloat() {
         clearTimeout(hideTimer);
@@ -575,17 +701,22 @@
 
       // Eventos de fechar
       btnX.addEventListener('click', closeFloat);
-      if (overlay) overlay.addEventListener('click', closeFloat);
+      //if (overlay) overlay.addEventListener('click', closeFloat);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFloat(); });
 
       // Converte placeholders [data-flash] em caixa flutuante
       document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-flash]').forEach(n => {
-          const ms = parseInt(n.getAttribute('data-flash'), 10) || 2000;
           const kind = (n.getAttribute('data-kind') || 'success').toLowerCase();
-          const txt = n.textContent || '';
-          n.remove();                  // não ocupa layout
-          openFloat(kind, txt, ms);    // mostra caixa
+          const raw  = n.getAttribute('data-flash');
+          const ms   = parseInt(raw, 10);
+          const dur  = Number.isFinite(ms) ? ms : 2000;   // sucesso/info: usa ms ou 2000
+        
+          const txt  = n.textContent || '';
+          n.remove();  // não ocupa layout
+        
+          // ✅ Somente ERRO fica sticky com botão OK
+          openFloat(kind, txt, (kind === 'error') ? 'sticky' : dur);
         });
       });
 
@@ -605,11 +736,12 @@
       const btnOk = document.getElementById('confirm-ok');
 
       let pendingHref = null;
+      let pendingForm = null;
 
       function decorateTitle(t) {
         const s = (t || 'Confirmar ação').trim();
         return `<span class="relative inline-block">
-            <span class="absolute w-[18px] h-[18px] bg-yellow-400 rounded-sm -left-2 top-[2px] z-0"></span>
+            <span class="absolute w-[18px] h-[18px] bg-yellow-400 rounded-sm -left-2 top-[-4px] z-0"></span>
             <span class="relative z-10">${s.charAt(0)}</span>${s.slice(1)}
           </span>`;
       }
@@ -629,6 +761,7 @@
         box.classList.remove('show');
         overlay.style.display = 'none';
         pendingHref = null;
+        pendingForm = null; 
       }
 
       // Ações dos botões
@@ -639,8 +772,10 @@
 
       btnOk.addEventListener('click', () => {
         if (pendingHref) {
-          // segue o fluxo original: GET /excluir/{id} (mantém tudo que já existe)
-          window.location.href = pendingHref;
+          window.location.href = pendingHref; // GET
+        } else if (pendingForm) {
+          // POST/PUT/DELETE etc. – submete o form original
+          pendingForm.submit();
         }
         closeConfirm();
       });
@@ -657,9 +792,22 @@
         openConfirm(message, href);
       });
 
+      // Delegação: captura SUBMIT em <form data-confirm="true">
+      document.addEventListener('submit', (ev) => {
+        const form = ev.target.closest('form[data-confirm="true"]');
+        if (!form) return;
+      
+        ev.preventDefault();          // bloqueia o submit automático
+        pendingForm = form;           // guarda o form para submeter depois
+        pendingHref = null;           // garante que não é navegação GET
+        const message = form.getAttribute('data-message') || 'Tem certeza?';
+        openConfirm(message, null);   // abre o mesmo modal
+      });
+
       // Expor global (se precisar abrir manualmente de outros pontos)
       window.openConfirm = openConfirm;
     })();
+
   </script>
 
 </body>

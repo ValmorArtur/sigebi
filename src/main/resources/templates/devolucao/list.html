@@ -92,7 +92,8 @@
                             <!-- Botão VERMELHO (Remover devolução) como POST, estilizado igual ao 'Excluir' do fragmento -->
                             <form th:action="@{'/devolucao/' + ${it.idEmprestimo} + '/remover'}" method="post"
                                 class="inline"
-                                onsubmit="return confirm('Remover esta devolução e reabrir o empréstimo?');">
+                                data-confirm="true"
+                                data-message="Remover esta devolução e reabrir o empréstimo?">
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                                 <input type="hidden" name="back" th:value="${urlBack}">
                                 <button type="submit" th:title="'Remover devolução'"
