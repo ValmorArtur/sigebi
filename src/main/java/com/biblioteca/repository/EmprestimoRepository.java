@@ -56,4 +56,8 @@ public interface EmprestimoRepository extends JpaRepository<Emprestimo, Integer>
         long countByExemplarIdTomboAndDataDevolucaoIsNull(String idTombo);
 
         Optional<Emprestimo> findFirstByExemplar_IdTomboAndDataDevolucaoIsNull(String idTombo);
+
+        // Quantos empréstimos existem para este exemplar (independente de dataDevolucao)
+        long countByExemplar_IdTombo(String idTombo);
+
 }

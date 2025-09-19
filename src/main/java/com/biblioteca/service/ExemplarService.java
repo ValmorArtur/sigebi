@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import com.biblioteca.repository.AcervoRepository;
+import com.biblioteca.repository.EmprestimoRepository;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
@@ -23,6 +25,9 @@ public class ExemplarService {
 
     @Autowired
     private EmprestimoService emprestimoService;
+
+    @Autowired
+    private EmprestimoRepository emprestimoRepository;      
 
     @Transactional(readOnly = true)
     public Page<Exemplar> listar(String q, int page, int size) {
@@ -165,6 +170,20 @@ public class ExemplarService {
             throw new IllegalStateException(
                     "Exclusão bloqueada: o exemplar está Emprestado ou Reservado.");
         }
+
+        long totalEmprestimos = emprestimoRepository.countByExemplar_IdTombo(id);
+        if (totalEmprestimos > 1) {
+            throw new IllegalStateException(
+                "Exclusão bloqueada: existem " + totalEmprestimos +
+                " registros de empréstimo associados a este exemplar (ativos ou já devolvidos)."
+            );
+        } else if (totalEmprestimos == 1) {
+            throw new IllegalStateException(
+                "Exclusão bloqueada: existe " + totalEmprestimos +
+                " registro de empréstimo associados a este exemplar (ativo ou já devolvido)."
+            );
+        };
+
         repository.delete(e);
     }
 
