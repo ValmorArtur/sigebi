@@ -481,7 +481,7 @@
 
       // Abre auto se a rota for de Livros
       const path = location.pathname || "";
-      if (["/acervo", "/exemplar", "/categoria", "/genero", "/autor"].some(p => path.startsWith(p))) {
+      if (["/acervo", "/exemplar", "/categoria", "/editora", "/genero", "/autor"].some(p => path.startsWith(p))) {
         openSubmenu();
       }
       // Marca link ativo

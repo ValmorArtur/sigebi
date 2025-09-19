@@ -70,8 +70,8 @@
         <!-- Acervo com submenu -->
         <div class="relative px-0">
             <button id="livrosToggle" th:classappend="${#strings.startsWith(uri,'/acervo') or #strings.startsWith(uri,'/exemplar') or
-                                     #strings.startsWith(uri,'/categoria') or #strings.startsWith(uri,'/genero') or
-                                     #strings.startsWith(uri,'/autor')} ? 'bg-[#1f2d3a]' : ''"
+                                     #strings.startsWith(uri,'/categoria') or #strings.startsWith(uri,'/genero')  or
+                                     #strings.startsWith(uri,'/editora') or #strings.startsWith(uri,'/autor')} ? 'bg-[#1f2d3a]' : ''"
                 class="w-full flex items-center justify-between px-4 py-3 hover:bg-[#1f2d3a] transition"
                 aria-haspopup="true" aria-expanded="false">
                 <span class="flex items-center ml-6">
@@ -99,11 +99,11 @@
                     </a>
 
                     <div sec:authorize="hasRole('ADMIN')">
-                        <a href="/exemplar"
-                            th:classappend="${#strings.startsWith(uri,'/exemplar')} ? 'bg-white/10' : ''" class="submenu-link flex items-center gap-3 px-4 py-2 text-[0.95rem] hover:bg-white/10 transition
-                                  opacity-0 translate-y-1 duration-200 delay-100 will-change-transform">
-                            <img src="/img/icon-exemplar.png" alt="Livros" class="w-4 h-4 opacity-90 object-contain"
-                                loading="lazy">Exemplar
+                        <a href="/autor" th:classappend="${#strings.startsWith(uri,'/autor')} ? 'bg-white/10' : ''"
+                            class="submenu-link flex items-center gap-3 px-4 py-2 text-[0.95rem] hover:bg-white/10 transition
+                                  opacity-0 translate-y-1 duration-200 delay-200 will-change-transform">
+                            <img src="/img/icon-authors.png" alt="Autor" class="w-4 h-4 opacity-90 object-contain"
+                                loading="lazy">Autor
                         </a>
                     </div>
 
@@ -117,6 +117,24 @@
                     </div>
 
                     <div sec:authorize="hasRole('ADMIN')">
+                        <a href="/editora"
+                            th:classappend="${#strings.startsWith(uri,'/editora')} ? 'bg-white/10' : ''" class="submenu-link flex items-center gap-3 px-4 py-2 text-[0.95rem] hover:bg-white/10 transition
+                                  opacity-0 translate-y-1 duration-200 delay-100 will-change-transform">
+                            <img src="/img/icon-publisher.png" alt="Livros" class="w-4 h-4 opacity-90 object-contain"
+                                loading="lazy">Editora
+                        </a>
+                    </div>
+
+                    <div sec:authorize="hasRole('ADMIN')">
+                        <a href="/exemplar"
+                            th:classappend="${#strings.startsWith(uri,'/exemplar')} ? 'bg-white/10' : ''" class="submenu-link flex items-center gap-3 px-4 py-2 text-[0.95rem] hover:bg-white/10 transition
+                                  opacity-0 translate-y-1 duration-200 delay-100 will-change-transform">
+                            <img src="/img/icon-exemplar.png" alt="Livros" class="w-4 h-4 opacity-90 object-contain"
+                                loading="lazy">Exemplar
+                        </a>
+                    </div>
+
+                    <div sec:authorize="hasRole('ADMIN')">
                         <a href="/genero" th:classappend="${#strings.startsWith(uri,'/genero')} ? 'bg-white/10' : ''"
                             class="submenu-link flex items-center gap-3 px-4 py-2 text-[0.95rem] hover:bg-white/10 transition
                                   opacity-0 translate-y-1 duration-200 delay-200 will-change-transform">
@@ -124,33 +142,11 @@
                                 loading="lazy">Gênero
                         </a>
                     </div>
-
-                    <div sec:authorize="hasRole('ADMIN')">
-                        <a href="/autor" th:classappend="${#strings.startsWith(uri,'/autor')} ? 'bg-white/10' : ''"
-                            class="submenu-link flex items-center gap-3 px-4 py-2 text-[0.95rem] hover:bg-white/10 transition
-                                  opacity-0 translate-y-1 duration-200 delay-200 will-change-transform">
-                            <img src="/img/icon-authors.png" alt="Autor" class="w-4 h-4 opacity-90 object-contain"
-                                loading="lazy">Autor
-                        </a>
-                    </div>
                 </nav>
             </div>
         </div>
 
         <hr class="border-t-[1px] border-[#6C6C6D] mt-0 mb-4">
-
-        <!-- Editoras -->
-        <div sec:authorize="hasRole('ADMIN')">
-            <hr class="border-t-[1px] border-[#6C6C6D] mt-0 mb-0">
-            <a href="/editora" th:classappend="${#strings.startsWith(uri,'/editora')} ? 'bg-[#1f2d3a]' : ''"
-                class="flex items-center px-4 py-3 hover:bg-[#1f2d3a]">
-                <span class="flex items-center ml-6">
-                    <img src="/img/icon-publisher.png" alt="Editoras" class="w-6 h-6 mr-3">
-                    <span class="menu-label">Editoras</span>
-                </span>
-            </a>
-            <hr class="border-t-[1px] border-[#6C6C6D] mt-0 mb-4">
-        </div>
 
         <div sec:authorize="hasRole('ADMIN')">
             <hr class="border-t-[1px] border-[#6C6C6D] mt-0 mb-0">        
