@@ -53,5 +53,9 @@ public interface AcervoRepository extends JpaRepository<Acervo, Integer> {
          )
         """)
     Page<Acervo> searchAll(@Param("filtro") String filtro, Pageable pageable);
+
+    // Conta quantos itens do acervo possuem o autor informado
+    long countByAutores_IdAutor(Integer idAutor);
+
 }
 

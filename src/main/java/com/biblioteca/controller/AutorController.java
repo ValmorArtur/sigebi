@@ -84,8 +84,15 @@ public class AutorController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/excluir/{id}")
     public String excluir(@PathVariable Integer id, RedirectAttributes ra) {
-        service.excluir(id);
-        ra.addFlashAttribute("mensagem", "Autor excluído.");
+        try {
+            service.excluir(id);
+            ra.addFlashAttribute("mensagem", "Autor excluído.");
+        } catch (IllegalStateException | IllegalArgumentException ex) {
+            ra.addFlashAttribute("erro", ex.getMessage());
+        } catch (Exception e) {
+            ra.addFlashAttribute("erro", "Erro ao excluir o registro.");
+        }
         return "redirect:/autor";
     }
+
 }
