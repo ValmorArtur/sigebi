@@ -35,16 +35,17 @@
                       focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
       </div>
 
-      <div>
+      <div class="relative pb-5">
         <label class="block text-gray-700 font-semibold">Telefone</label>
-        <input th:field="*{foneEditora}" id="foneEditora" inputmode="numeric" maxlength="15"
-          placeholder="(00) 00000-0000" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
-                      focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
-        <small id="alertTelefone"
-          class="hidden text-red-700 bg-red-100 border border-red-400 px-2 py-1 rounded mt-1 inline-block">
-          Telefone inválido.
-        </small>
+        <input type="text" th:field="*{foneEditora}" id="foneEditora" maxlength="15" inputmode="numeric"
+          aria-invalid="false" aria-describedby="erroFoneEditora" autocomplete="tel" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" required>
+        <p id="erroFoneEditora" class="text-red-600 text-sm leading-5 h-5 whitespace-nowrap overflow-hidden text-ellipsis hidden
+            absolute left-0 bottom-0">
+          Telefone inválido. Use DDD + número (10 ou 11 dígitos).
+        </p>
       </div>
+
 
       <!-- Endereço -->
       <div>
@@ -118,13 +119,35 @@
   <!-- Scripts -->
   <script>
     // --- Utilitários de máscara ---
-    function maskPhone(v) {
-      v = v.replace(/\D/g, '').slice(0, 11);
-      if (v.length <= 2) return v.replace(/^(\d{0,2}).*/, '($1');
-      if (v.length <= 6) return v.replace(/^(\d{2})(\d{0,4}).*/, '($1) $2');
-      if (v.length <= 10) return v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
-      return v.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+    function somenteDigitos(e) {
+      const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
+      const isCtrlCmd = e.ctrlKey || e.metaKey;
+      if (allowed.includes(e.key) || (isCtrlCmd && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase()))) return;
+      if (!/\d/.test(e.key)) e.preventDefault();
     }
+
+    // Formata a partir de "apenas dígitos"
+    function formatTelefoneFromDigits(d) {
+      if (d.length <= 10) {
+        // (99) 9999-9999
+        return d
+          .replace(/^(\d{0,2})(\d{0,4})(\d{0,4}).*$/, (m, a, b, c) =>
+            [a ? `(${a}` : '', a && a.length === 2 ? ') ' : '', b, b && c ? '-' : '', c].join('')
+          );
+      }
+      // (99) 99999-9999
+      return d
+        .replace(/^(\d{0,2})(\d{0,5})(\d{0,4}).*$/, (m, a, b, c) =>
+          [a ? `(${a}` : '', a && a.length === 2 ? ') ' : '', b, b && c ? '-' : '', c].join('')
+        );
+    }
+
+    // aplica a máscara dinâmica usando o formatador acima
+    function aplicarMascaraTelefoneDinamica(el) {
+      const d = el.value.replace(/\D/g, '');
+      el.value = formatTelefoneFromDigits(d);
+    }
+
 
     function maskCep(v) {
       v = v.replace(/\D/g, '').slice(0, 8);
@@ -174,24 +197,96 @@
       const estado = document.getElementById('estadoEditora');
 
       const alertCep = document.getElementById('alertCep');
-      const alertTelefone = document.getElementById('alertTelefone');
+      const msgFoneEditora = document.getElementById('erroFoneEditora');
+      let touchedFone = false;
+
 
       // Máscara telefone
+      // (1) Keydown especial: Backspace/Delete sobre caracteres da máscara
       if (fone) {
-        fone.addEventListener('input', (e) => {
-          const cur = e.target.selectionStart;
-          const before = e.target.value;
-          e.target.value = maskPhone(e.target.value);
-          // validação simples: pelo menos DDD + 8 dígitos
-          const digits = onlyDigits(e.target.value);
-          const valid = digits.length === 10 || digits.length === 11;
-          if (!valid && digits.length > 0) {
-            alertTelefone.classList.remove('hidden');
+        fone.addEventListener("keydown", function (e) {
+          const el = this;
+
+          // Deixe passar atalhos e navegação
+          const allowed = ['Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+          const isCtrlCmd = e.ctrlKey || e.metaKey;
+          if (allowed.includes(e.key) || (isCtrlCmd && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase()))) return;
+
+          const val = el.value;
+          const selStart = el.selectionStart ?? val.length;
+          const selEnd = el.selectionEnd ?? val.length;
+
+          if (selStart !== selEnd) return; // seleção: comportamento padrão
+
+          if (e.key === 'Backspace' || e.key === 'Delete') {
+            const idx = e.key === 'Backspace' ? selStart - 1 : selStart;
+            const ch = val.charAt(idx);
+
+            if (ch && /\D/.test(ch)) {
+              e.preventDefault();
+              let digits = val.replace(/\D/g, '');
+              if (digits.length === 0) return;
+
+              if (e.key === 'Backspace') {
+                digits = digits.slice(0, -1); // remove último dígito
+              } else {
+                digits = digits.slice(1);     // remove primeiro dígito
+              }
+              el.value = formatTelefoneFromDigits(digits);
+              el.setSelectionRange(el.value.length, el.value.length);
+              return;
+            }
+          }
+
+          // mantém "somente números" para teclas imprimíveis
+          if (e.key.length === 1 && !/\d/.test(e.key)) e.preventDefault();
+        });
+      }
+
+      // (2) Input: aplica máscara e marca como "tocado"
+      if (fone) {
+        fone.addEventListener("keydown", somenteDigitos); // igual ao usuário/form
+        fone.addEventListener("input", () => {
+          aplicarMascaraTelefoneDinamica(fone);
+          touchedFone = true;
+        });
+        fone.addEventListener("change", () => { touchedFone = true; });
+      }
+
+      // (3) Blur: valida como no usuário/form
+      if (fone) {
+        fone.addEventListener("blur", () => {
+          const valor = fone.value.trim();
+
+          if (valor === "") {
+            // sem valor: limpa erro visual
+            fone.classList.remove("border-red-500");
+            fone.setAttribute("aria-invalid", "false");
+            if (msgFoneEditora) msgFoneEditora.classList.add("hidden");
+            return;
+          }
+
+          if (!touchedFone) return;
+
+          const d = valor.replace(/\D/g, '');
+          const ok = (d.length === 10 || d.length === 11);
+
+          if (!ok) {
+            fone.classList.add("border-red-500");
+            fone.setAttribute("aria-invalid", "true");
+            if (msgFoneEditora) {
+              msgFoneEditora.textContent = "Telefone inválido. Use DDD + número (10 ou 11 dígitos).";
+              msgFoneEditora.classList.remove("hidden");
+            }
+            setTimeout(() => { fone.focus(); fone.select(); }, 0);
           } else {
-            alertTelefone.classList.add('hidden');
+            fone.classList.remove("border-red-500");
+            fone.setAttribute("aria-invalid", "false");
+            if (msgFoneEditora) msgFoneEditora.classList.add("hidden");
           }
         });
       }
+
 
       // Máscara e busca automática CEP
       if (cep) {
@@ -236,16 +331,27 @@
         }
 
         // Telefone: se preenchido, 10 ou 11 dígitos
+        // Telefone: se preenchido, 10 ou 11 dígitos (mesma regra do usuário/form)
         if (fone && fone.value.trim() !== '') {
-          const digits = onlyDigits(fone.value);
-          const ok = digits.length === 10 || digits.length === 11;
+          const d = fone.value.replace(/\D/g, '');
+          const ok = (d.length === 10 || d.length === 11);
           if (!ok) {
             e.preventDefault();
-            alertTelefone.classList.remove('hidden');
+            fone.classList.add("border-red-500");
+            fone.setAttribute("aria-invalid", "true");
+            if (msgFoneEditora) {
+              msgFoneEditora.textContent = "Telefone inválido. Use DDD + número (10 ou 11 dígitos).";
+              msgFoneEditora.classList.remove("hidden");
+            }
             fone.focus();
             return false;
+          } else {
+            fone.classList.remove("border-red-500");
+            fone.setAttribute("aria-invalid", "false");
+            if (msgFoneEditora) msgFoneEditora.classList.add("hidden");
           }
         }
+
       });
     });
 

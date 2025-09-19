@@ -256,21 +256,29 @@
       return resto === parseInt(cpf.charAt(10));
     }
 
-    // máscara dinâmica: (99) 9999-9999 ou (99) 99999-9999
-    function aplicarMascaraTelefoneDinamica(el) {
-      const d = el.value.replace(/\D/g, '');
+    // Formata a partir de "apenas dígitos"
+    function formatTelefoneFromDigits(d) {
       if (d.length <= 10) {
-        el.value = d
+        // (99) 9999-9999
+        return d
           .replace(/^(\d{0,2})(\d{0,4})(\d{0,4}).*$/, (m, a, b, c) =>
             [a ? `(${a}` : '', a && a.length === 2 ? ') ' : '', b, b && c ? '-' : '', c].join('')
           );
-      } else {
-        el.value = d
-          .replace(/^(\d{0,2})(\d{0,5})(\d{0,4}).*$/, (m, a, b, c) =>
-            [a ? `(${a}` : '', a && a.length === 2 ? ') ' : '', b, b && c ? '-' : '', c].join('')
-          );
       }
+      // (99) 99999-9999
+      return d
+        .replace(/^(\d{0,2})(\d{0,5})(\d{0,4}).*$/, (m, a, b, c) =>
+          [a ? `(${a}` : '', a && a.length === 2 ? ') ' : '', b, b && c ? '-' : '', c].join('')
+        );
     }
+
+    // máscara dinâmica: (99) 9999-9999 ou (99) 99999-9999
+    // máscara dinâmica usando o formatador acima
+    function aplicarMascaraTelefoneDinamica(el) {
+      const d = el.value.replace(/\D/g, '');
+      el.value = formatTelefoneFromDigits(d);
+    }
+
 
     function validarEmailSimples(email) {
       const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -311,6 +319,57 @@
 
       const cepInput = document.getElementById("cep");
       const nomeUsuario = document.getElementById("nomeUsuario");
+
+      // Trata Backspace/Delete quando o cursor está sobre um caractere da máscara
+      foneUsuario.addEventListener("keydown", function (e) {
+        const el = this;
+
+        // Deixe passar atalhos e navegação
+        const allowed = ['Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+        const isCtrlCmd = e.ctrlKey || e.metaKey;
+        if (allowed.includes(e.key) || (isCtrlCmd && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase()))) return;
+
+        // Situação atual
+        const val = el.value;
+        const selStart = el.selectionStart ?? val.length;
+        const selEnd = el.selectionEnd ?? val.length;
+
+        // Se há seleção, deixa o comportamento normal (o input + máscara cuidam)
+        if (selStart !== selEnd) return;
+
+        // Backspace/Delete: se o caractere alvo NÃO é dígito, a gente consome 1 dígito real
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+          // Caractere "alvo" (antes p/ Backspace, depois p/ Delete)
+          const idx = e.key === 'Backspace' ? selStart - 1 : selStart;
+          const ch = val.charAt(idx);
+
+          if (ch && /\D/.test(ch)) {
+            // Estamos sobre um caracter da MÁSCARA -> remover 1 dígito real
+            e.preventDefault();
+
+            let digits = val.replace(/\D/g, '');
+            if (digits.length === 0) return;
+
+            // Estratégia:
+            // - Backspace: remove o dígito imediatamente ANTES do cursor lógico
+            // - Delete:    remove o dígito imediatamente DEPOIS do cursor lógico
+            if (e.key === 'Backspace') {
+              digits = digits.slice(0, -1);              // remove o último dígito
+            } else {
+              digits = digits.slice(1);                  // remove o primeiro dígito
+            }
+
+            // Reaplica a máscara e move o cursor para o fim (comportamento natural)
+            el.value = formatTelefoneFromDigits(digits);
+            el.setSelectionRange(el.value.length, el.value.length);
+            return;
+          }
+        }
+
+        // Mantém sua regra de "somente números" (deixa Backspace/Delete passarem)
+        if (e.key.length === 1 && !/\d/.test(e.key)) e.preventDefault();
+      });
+
 
       // Só números no teclado
       cepInput.addEventListener("keydown", somenteDigitos);
