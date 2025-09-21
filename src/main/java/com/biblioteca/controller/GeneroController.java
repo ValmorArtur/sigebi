@@ -111,10 +111,10 @@ public class GeneroController {
         try {
             service.excluir(id);
             ra.addFlashAttribute("mensagem", "Gênero excluído com sucesso.");
-        } catch (DataIntegrityViolationException dive) {
-            ra.addFlashAttribute("erro", "Não foi possível excluir: o registro está vinculado a outros dados.");
+        } catch (IllegalStateException ex) {
+            ra.addFlashAttribute("erro", ex.getMessage());
         } catch (Exception e) {
-            ra.addFlashAttribute("erro", "Erro ao excluir o registro.");
+            ra.addFlashAttribute("erro", "Erro ao excluir o Gênero.");
         }
         return "redirect:/genero";
     }

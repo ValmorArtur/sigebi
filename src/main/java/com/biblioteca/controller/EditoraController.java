@@ -65,12 +65,18 @@ public class EditoraController {
         ra.addFlashAttribute("mensagem", "Editora salva.");
         return "redirect:/editora";
     }
-
+    
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/excluir/{id}")
     public String excluir(@PathVariable Integer id, RedirectAttributes ra) {
-        service.excluir(id);
-        ra.addFlashAttribute("mensagem", "Excluída.");
+        try {
+            service.excluir(id);
+            ra.addFlashAttribute("mensagem", "Editora excluída.");
+        } catch (IllegalStateException ex) {
+            ra.addFlashAttribute("erro", ex.getMessage());
+        } catch (Exception e) {
+            ra.addFlashAttribute("erro", "Erro ao excluir o registro.");
+        }
         return "redirect:/editora";
     }
 

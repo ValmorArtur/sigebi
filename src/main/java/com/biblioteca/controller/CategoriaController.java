@@ -69,8 +69,16 @@ public class CategoriaController {
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/excluir/{id}")
   public String excluir(@PathVariable Integer id, RedirectAttributes ra) {
-    service.excluir(id);
-    ra.addFlashAttribute("mensagem", "Excluído.");
-    return "redirect:/categoria";
+      try {
+          service.excluir(id);
+          ra.addFlashAttribute("mensagem", "Categoria excluída.");
+      } catch (IllegalStateException ex) {
+          // Mensagem amigável vinda do service
+          ra.addFlashAttribute("erro", ex.getMessage());
+      } catch (Exception e) {
+          // Fallback genérico
+          ra.addFlashAttribute("erro", "Erro ao excluir o registro.");
+      }
+      return "redirect:/categoria";
   }
 }

@@ -57,5 +57,14 @@ public interface AcervoRepository extends JpaRepository<Acervo, Integer> {
     // Conta quantos itens do acervo possuem o autor informado
     long countByAutores_IdAutor(Integer idAutor);
 
+    // Conta quantos acervos usam a categoria informada
+    long countByCategoria_IdCategoria(Integer idCategoria);
+
+    // Conta quantos acervos usam a gênero informado
+    long countByGenero_IdGenero(Integer idGenero);
+
+    // Quantos itens do acervo usam a editora informada
+    long countByEditora_IdEditora(Integer idEditora);
+
 }
 

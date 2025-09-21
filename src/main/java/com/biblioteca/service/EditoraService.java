@@ -1,6 +1,7 @@
 package com.biblioteca.service;
 
 import com.biblioteca.model.Editora;
+import com.biblioteca.repository.AcervoRepository;
 import com.biblioteca.repository.EditoraRepository;
 import org.springframework.stereotype.Service;
 
@@ -9,11 +10,17 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class EditoraService {
 
     @Autowired
     private EditoraRepository repo;
+
+    @Autowired
+    private AcervoRepository acervoRepo;
 
     public Page<Editora> listar(String filtro, int page, int size){
         Pageable p = PageRequest.of(page, size, Sort.by("nomeEditora").ascending());
@@ -49,8 +56,29 @@ public class EditoraService {
         return repo.save(e);
     }
 
+    @Transactional
     public void excluir(Integer id){
-        repo.deleteById(id);
+        long qtd = acervoRepo.countByEditora_IdEditora(id);
+        if (qtd > 1) {
+            // mensagem clara e amigável para o usuário
+            throw new IllegalStateException(
+                "Não é possível excluir a editora: existem " + qtd + " itens do acervo relacionados a ela."
+            );
+        } else if (qtd == 1) {
+            // mensagem clara e amigável para o usuário
+            throw new IllegalStateException(
+                "Não é possível excluir a editora: existe " + qtd + " item do acervo relacionados a ela."
+            );
+        }
+
+        try {
+            repo.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            // Qualquer outra constraint/índice que dispare vira uma msg padrão
+            throw new IllegalStateException(
+                "Não é possível excluir a editora porque há registros relacionados.", e
+            );
+        }
     }
 
     // suporte a busca por "Sim/Não", "Ativo/Inativo", "true/false", "1/0"
