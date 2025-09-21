@@ -4,7 +4,6 @@ package com.biblioteca.controller;
 import com.biblioteca.model.Genero;
 import com.biblioteca.service.GeneroService;
 import jakarta.validation.Valid;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
