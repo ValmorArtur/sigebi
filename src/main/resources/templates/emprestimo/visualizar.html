@@ -77,13 +77,13 @@
 
     <!-- Devolver: só aparece se ainda não devolvido -->
     <form th:if="${!jaDevolvido}" th:action="@{/emprestimo/{id}/devolver(id=${e.idEmprestimo})}" method="post"
-      onsubmit="return confirm('Confirmar devolução deste empréstimo?');" class="inline">
+      data-confirm="true" data-message="Confirmar devolução deste empréstimo?" class="inline">
       <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
       <input type="hidden" name="back" th:value="${#strings.isEmpty(back) ? '/emprestimo' : back}">
       <button type="submit" class="bg-[#2e3f52] hover:bg-[#1f2d3a] text-white px-6 py-2 rounded">
         Devolver
       </button>
-      
+
     </form>
   </div>
 
