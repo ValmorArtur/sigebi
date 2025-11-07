@@ -47,8 +47,25 @@
       </div>
 
 
+      <!-- Título e flash de mensagens do endereço (igual ao de Usuários) -->
+      <div class="mt-6 md:col-span-2">
+        <div class="flex flex-wrap items-center gap-3">
+          <h2 class="text-lg font-semibold text-gray-800">Endereço</h2>
+          <div id="flashEndereco" role="status" aria-live="polite"
+            class="hidden inline-flex items-center rounded px-3 py-1 text-sm font-semibold border transition-opacity duration-300">
+          </div>
+        </div>
+        <!-- Opcional: regra “tudo ou nada” como em Usuários -->
+        <div id="alertEndereco"
+          class="hidden mt-2 p-3 rounded bg-yellow-100 border border-yellow-400 text-yellow-800 font-medium">
+          Se você preencher qualquer campo do endereço, todos os campos devem ser preenchidos.
+        </div>
+      </div>
+
+
+
       <!-- Endereço -->
-      <div>
+      <div class="md:col-span-1">
         <label class="block text-gray-700 font-semibold">CEP</label>
         <input th:field="*{cepEditora}" id="cepEditora" inputmode="numeric" maxlength="9" placeholder="00000-000" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
                       focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400" />
@@ -164,11 +181,12 @@
     async function fetchViaCep(cepDigits) {
 
       if (!navigator.onLine) {
-        // se estiver Offline: 
         console.warn("Sem internet: preencha o endereço manualmente.");
-        alert("Sem internet: preencha o endereço manualmente.");
+        limparCamposEnderecoEditora();
+        flashEndereco("Sem internet: preencha o endereço manualmente.", "error", 4500);
         return; // não chama ViaCEP
       }
+
 
       try {
         const resp = await fetch(`https://viacep.com.br/ws/${cepDigits}/json/`);
@@ -183,6 +201,8 @@
         };
       } catch (e) {
         console.error('ViaCEP indisponível. Preencha o endereço manualmente.', e);
+        limparCamposEnderecoEditora();
+        flashEndereco("ViaCEP indisponível. Preencha o endereço manualmente.", "error", 4500);
         return { ok: false };
       }
     }
@@ -303,6 +323,8 @@
               if (estado) estado.value = res.uf;
             } else {
               alertCep.classList.remove('hidden');
+              limparCamposEnderecoEditora();
+              flashEndereco("CEP inválido ou não encontrado. Preencha o endereço manualmente.", "warning", 3000);
             }
           }
         };
@@ -329,6 +351,25 @@
             return false;
           }
         }
+
+        // --- Endereço: tudo ou nada ---
+        const ruaVal = document.getElementById("ruaEditora")?.value.trim() || "";
+        const numeroVal = document.getElementById("numeroEditora")?.value.trim() || "";
+        const bairroVal = document.getElementById("bairroEditora")?.value.trim() || "";
+        const cidadeVal = document.getElementById("cidadeEditora")?.value.trim() || "";
+        const estadoVal = document.getElementById("estadoEditora")?.value.trim() || "";
+        const cepVal = cep?.value.trim() || "";
+
+        const camposEnd = [cepVal, ruaVal, numeroVal, bairroVal, cidadeVal, estadoVal];
+        const preenchidos = camposEnd.filter(v => v !== "");
+
+        if (preenchidos.length > 0 && preenchidos.length < camposEnd.length) {
+          e.preventDefault();
+          flashEndereco("Complete todos os campos do endereço.", "warning", 3500);
+          document.getElementById("cepEditora")?.focus();
+          return false;
+        }
+
 
         // Telefone: se preenchido, 10 ou 11 dígitos
         // Telefone: se preenchido, 10 ou 11 dígitos (mesma regra do usuário/form)
@@ -404,6 +445,38 @@
         }
       });
     });
+
+    // --- mesmas funções usadas em Usuários ---
+
+    function flashEndereco(msg, type = "info", ms = 3000) {
+      const el = document.getElementById("flashEndereco");
+      if (!el) return;
+
+      const base = "inline-flex items-center rounded px-3 py-1 text-sm font-semibold border transition-opacity duration-300";
+      const variants = {
+        info: "bg-blue-100  border-blue-400  text-blue-800",
+        success: "bg-green-100 border-green-400 text-green-800",
+        warning: "bg-yellow-100 border-yellow-400 text-yellow-800",
+        error: "bg-red-100   border-red-400   text-red-800",
+      };
+
+      el.className = base + " " + (variants[type] || variants.info);
+      el.textContent = msg;
+      el.classList.remove("hidden");
+      el.style.opacity = 1;
+
+      clearTimeout(el._hideTimer);
+      el._hideTimer = setTimeout(() => {
+        el.style.opacity = 0;
+        setTimeout(() => el.classList.add("hidden"), 300);
+      }, ms);
+    }
+
+    function limparCamposEnderecoEditora() {
+      const ids = ["ruaEditora", "bairroEditora", "cidadeEditora", "estadoEditora", "numeroEditora"];
+      ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+    }
+
 
   </script>
 </div>
