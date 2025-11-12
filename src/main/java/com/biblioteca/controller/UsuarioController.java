@@ -6,6 +6,7 @@ import com.biblioteca.service.UsuarioService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -130,9 +131,19 @@ public class UsuarioController {
     // EXCLUIR usuário
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/excluir/{id}")
+    @PostMapping("/usuario/excluir/{id}")
     public String excluir(@PathVariable Integer id, RedirectAttributes ra) {
-        usuarioService.excluir(id);
-        ra.addFlashAttribute("mensagem", "Usuário excluído com sucesso.");
+        try {
+            usuarioService.excluir(id);
+            ra.addFlashAttribute("mensagem", "Usuário excluído com sucesso!");
+        } catch (DataIntegrityViolationException dive) {
+            // mensagem amigável que será exibida nos toasts do HTML
+            ra.addFlashAttribute("erro", dive.getMessage());
+        } catch (Exception e) {
+            // fallback para qualquer outro erro inesperado
+            ra.addFlashAttribute("erro", "Erro ao excluir usuário: " + e.getMessage());
+        }
+
         return "redirect:/usuario";
     }
 

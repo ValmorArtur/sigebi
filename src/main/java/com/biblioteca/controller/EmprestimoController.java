@@ -107,7 +107,11 @@ public class EmprestimoController {
 
         List<Exemplar> exemplares;
         if (tombo != null) {
-            exemplares = exemplarRepo.findAllById(List.of(tombo));
+            String tomboSeguro = java.util.Objects.requireNonNull(tombo, "tombo não pode ser nulo");
+            exemplares = exemplarRepo.findById(tomboSeguro)
+                    .map(java.util.List::of)
+                    .orElseGet(java.util.List::of);
+
         } else if (idAcervo != null) {
             exemplares = exemplarRepo.findByAcervo_IdAcervoAndSituacao(idAcervo, SituacaoExemplar.DISPONIVEL);
         } else {
@@ -153,18 +157,22 @@ public class EmprestimoController {
         } catch (Exception e) {
             ra.addFlashAttribute("erro", e.getMessage());
 
-            // Monta a query string preservando 'back' (ENCODADO) e, se possível, o 'tombo'
-            // selecionado
+            final var UTF8 = java.util.Objects.requireNonNull(StandardCharsets.UTF_8);
+
             StringBuilder qs = new StringBuilder();
             if (StringUtils.hasText(back) && back.startsWith("/")) {
+                final String safeBack = java.util.Objects.requireNonNull(back, "back não pode ser nulo aqui");
                 qs.append(qs.length() == 0 ? "?" : "&")
                         .append("back=")
-                        .append(UriUtils.encodeQueryParam(back, StandardCharsets.UTF_8));
+                        .append(UriUtils.encodeQueryParam(safeBack, UTF8));
             }
             if (form.getExemplar() != null && StringUtils.hasText(form.getExemplar().getIdTombo())) {
+                final String tomboSel = java.util.Objects.requireNonNull(
+                        form.getExemplar().getIdTombo(),
+                        "tombo não pode ser nulo aqui");
                 qs.append(qs.length() == 0 ? "?" : "&")
                         .append("tombo=")
-                        .append(UriUtils.encodeQueryParam(form.getExemplar().getIdTombo(), StandardCharsets.UTF_8));
+                        .append(UriUtils.encodeQueryParam(tomboSel, UTF8));
             }
 
             return "redirect:/emprestimo/novo" + qs;
@@ -210,9 +218,12 @@ public class EmprestimoController {
         } catch (Exception ex) {
             ra.addFlashAttribute("erro", "Não foi possível renovar: " + ex.getMessage());
         }
+        final var UTF8 = java.util.Objects.requireNonNull(StandardCharsets.UTF_8);
+
         return (StringUtils.hasText(back)
-                ? "redirect:" + UriUtils.encodePath(back, StandardCharsets.UTF_8)
+                ? "redirect:" + UriUtils.encodePath(java.util.Objects.requireNonNull(back), UTF8)
                 : "redirect:/emprestimo");
+
     }
 
     @PostMapping("/emprestimo/{id}/devolver")

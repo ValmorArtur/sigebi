@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
+
 public interface EmprestimoRepository extends JpaRepository<Emprestimo, Integer> {
 
         // EmprestimoRepository.java
@@ -59,5 +60,8 @@ public interface EmprestimoRepository extends JpaRepository<Emprestimo, Integer>
 
         // Quantos empréstimos existem para este exemplar (independente de dataDevolucao)
         long countByExemplar_IdTombo(String idTombo);
+
+        boolean existsByUsuario_IdUsuario(Integer idUsuario);
+
 
 }

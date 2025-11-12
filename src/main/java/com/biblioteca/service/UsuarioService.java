@@ -2,6 +2,7 @@ package com.biblioteca.service;
 
 import com.biblioteca.model.Endereco;
 import com.biblioteca.model.Usuario;
+import com.biblioteca.repository.EmprestimoRepository;
 import com.biblioteca.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,17 +10,31 @@ import java.util.List;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Objects;
 
 import java.util.Optional;
 
 @Service
 public class UsuarioService {
 
+    private final EmprestimoRepository emprestimoRepository;
+
     @Autowired
     private UsuarioRepository usuarioRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+   // UsuarioService(EmprestimoRepository emprestimoRepository) {
+   //     this.emprestimoRepository = emprestimoRepository;
+   // }
+    public UsuarioService(UsuarioRepository usuarioRepository,
+                          EmprestimoRepository emprestimoRepository) {
+        this.usuarioRepository = usuarioRepository;
+        this.emprestimoRepository = emprestimoRepository;
+    }
 
     public void salvar(Usuario usuario) {
         if (usuario.getIdUsuario() != null) {
@@ -121,8 +136,27 @@ public class UsuarioService {
     }
 
     // EXCLUIR usuário por ID
+    @Transactional(noRollbackFor = DataIntegrityViolationException.class)
     public void excluir(Integer id) {
-        usuarioRepository.deleteById(id);
+        Integer idSeguro = Objects.requireNonNull(id, "id não pode ser nulo");
+
+        if (emprestimoRepository.existsByUsuario_IdUsuario(idSeguro)) {
+            Usuario usuario = usuarioRepository.findById(idSeguro)
+                    .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado: " + idSeguro));
+
+            // Inativa e garante flush ANTES de lançar a exceção
+            usuario.setAtivo(false);
+            usuarioRepository.saveAndFlush(usuario);
+
+            // Lança exceção amigável — NÃO dará rollback por causa do noRollbackFor
+            throw new DataIntegrityViolationException(
+                "Não é possível excluir este usuário, pois ele possui empréstimos registrados. "
+              + "O sistema o inativou automaticamente para preservar o histórico."
+            );
+        }
+
+        // Caso não haja vínculos, pode excluir normalmente
+        usuarioRepository.deleteById(idSeguro);
     }
 
     public Page<Usuario> listarComPaginacao(String filtro, Pageable pageable) {
